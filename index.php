@@ -61,7 +61,7 @@ function decorate_price ($price_num) {
 			$dec_price = $round_num;
 			$dec_price .= "₽";
 		}
-		else if ($round_num > 1000) {
+		else if ($round_num >= 1000) {
 			$dec_price = number_format($round_num, 0, ' ', ' ');
 			$dec_price .= '₽';
 		}
