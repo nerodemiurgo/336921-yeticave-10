@@ -50,6 +50,23 @@ $lots_list = [
 	'img_url' => 'img/lot-6.jpg'
 	],
 ];
+
+//Добавляем функцию оформления цены
+function decorate_price ($price_num) {
+		$dec_price = "";
+		
+		$round_num = ceil($price_num);
+		
+		if ($round_num < 1000) {
+			$dec_price = $round_num;
+			$dec_price .= "₽";
+		}
+		else if ($round_num >= 1000) {
+			$dec_price = number_format($round_num, 0, ' ', ' ');
+			$dec_price .= '₽';
+		}
+	return $dec_price;
+}
 ?>
 
 <!DOCTYPE html>
@@ -129,7 +146,7 @@ z
                     <div class="lot__state">
                         <div class="lot__rate">
                             <span class="lot__amount">Стартовая цена</span>
-                            <span class="lot__cost"><?=$item['price']; ?><b class="rub">р</b></span>
+                            <span class="lot__cost"><?=decorate_price($item['price']); ?></span>
                         </div>
                         <div class="lot__timer timer">
                             12:23
