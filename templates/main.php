@@ -19,7 +19,7 @@
 			<?php foreach ($lots_list as $item): ?>
             <li class="lots__item lot">
                 <div class="lot__image">
-                    <img src="<?=$item['img_url'];?>" width="350" height="260" alt="">
+                    <img src="<?=htmlspecialchars($item['img_url']);?>" width="350" height="260" alt="">
                 </div>
                 <div class="lot__info">
                     <span class="lot__category"><?=htmlspecialchars($item['category']); ?></span>
@@ -29,9 +29,16 @@
                             <span class="lot__amount">Стартовая цена</span>
                             <span class="lot__cost"><?=htmlspecialchars(decorate_price($item['price'])); ?></span>
                         </div>
-                        <div class="lot__timer timer">
-                            12:23
-                        </div>
+						<?php $timeend = timeuptoend(htmlspecialchars($item['time_end']));
+                        if ($timeend[0] > 0): ?>
+							<div class="lot__timer timer">
+								<?=$timeend[0] . ':' . $timeend[1];?> 
+							</div>
+						<?php else : ?>
+							<div class="lot__timer timer timer——finishing" style="background: #f84646;">
+								<?=$timeend[0] . ':' . $timeend[1];?> 
+							</div>
+						<?php endif; ?>
                     </div>
                 </div>
             </li>
