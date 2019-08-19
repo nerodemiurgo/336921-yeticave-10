@@ -29,13 +29,13 @@
                             <span class="lot__amount">Стартовая цена</span>
                             <span class="lot__cost"><?=htmlspecialchars(decorate_price($item['price'])); ?></span>
                         </div>
-						<?php $timeend = timeuptoend(htmlspecialchars($item['time_end']));
+						<?php $timeend = timeuptoend($item['time_end']);
                         if ($timeend[0] > 0): ?>
 							<div class="lot__timer timer">
 								<?=$timeend[0] . ':' . $timeend[1];?> 
 							</div>
 						<?php else : ?>
-							<div class="lot__timer timer timer——finishing" style="background: #f84646;">
+							<div class="lot__timer timer timer--finishing">
 								<?=$timeend[0] . ':' . $timeend[1];?> 
 							</div>
 						<?php endif; ?>

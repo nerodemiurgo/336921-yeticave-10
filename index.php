@@ -59,7 +59,7 @@ $lots_list = [
 	'category' => 'Разное',
 	'price' => '5400',
 	'img_url' => 'img/lot-6.jpg',
-	'time_end' => '2019-08-19'
+	'time_end' => '2019-08-20'
 	],
 ];
 
