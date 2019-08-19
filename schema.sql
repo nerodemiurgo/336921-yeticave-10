@@ -1,0 +1,45 @@
+CREATE DATABASE yeticave
+	DEFAULT CHARACTER SET utf8
+	DEFAULT COLLATE utf8_general_ci;
+	
+USE yeticave;
+	
+CREATE TABLE lot (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	lot_name CHAR(128) NOT NULL,
+	lot_description TEXT(2048) NOT NULL,
+	lot_img CHAR(128) NOT NULL,
+	start_price INT NOT NULL,
+	dt_finish DATE NOT NULL,
+	rate_step INT NOT NULL,
+	category_id INT NOT NULL,
+	autor_id INT NOT NULL,
+	winner_id INT
+);
+
+CREATE INDEX l_name ON lot(lot_name);
+
+CREATE TABLE user (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	dt_registration TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	user_name CHAR(128) NOT NULL,
+	email CHAR(128) NOT NULL UNIQUE,
+	password CHAR(128) NOT NULL,
+	avatar CHAR(128) NOT NULL,
+	contact CHAR(255) NOT NULL
+);
+
+CREATE TABLE category (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	category_name CHAR(128) NOT NULL UNIQUE,
+	category_code CHAR(128) NOT NULL
+);
+
+CREATE TABLE rate (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	bid INT NOT NULL,
+	user_id INT NOT NULL,
+	lot_id INT NOT NULL
+);
