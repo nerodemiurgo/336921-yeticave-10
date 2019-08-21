@@ -6,10 +6,10 @@ USE yeticave;
 	
 CREATE TABLE lot (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-	lot_name CHAR(128) NOT NULL,
-	lot_description TEXT(2048) NOT NULL,
-	lot_img CHAR(128) NOT NULL,
+	created_at DATETIME DEFAULT NOW(),
+	name CHAR(128) NOT NULL,
+	description TEXT(2048) NOT NULL,
+	img CHAR(128) NOT NULL,
 	start_price INT NOT NULL,
 	dt_finish DATE NOT NULL,
 	rate_step INT NOT NULL,
@@ -18,27 +18,25 @@ CREATE TABLE lot (
 	winner_id INT
 );
 
-CREATE INDEX l_name ON lot(lot_name);
-
 CREATE TABLE user (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	dt_registration TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	registered_at DATETIME DEFAULT NOW(),
 	user_name CHAR(128) NOT NULL,
 	email CHAR(128) NOT NULL UNIQUE,
 	password CHAR(128) NOT NULL,
-	avatar CHAR(128) NOT NULL,
+	avatar CHAR(128),
 	contact CHAR(255) NOT NULL
 );
 
 CREATE TABLE category (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	category_name CHAR(128) NOT NULL UNIQUE,
-	category_code CHAR(128) NOT NULL
+	name CHAR(128) NOT NULL UNIQUE,
+	code CHAR(128) NOT NULL
 );
 
 CREATE TABLE rate (
 	id INT AUTO_INCREMENT PRIMARY KEY,
-	dt_create TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+	created_at DATETIME DEFAULT NOW(),
 	bid INT NOT NULL,
 	user_id INT NOT NULL,
 	lot_id INT NOT NULL
