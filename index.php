@@ -25,7 +25,7 @@ $lots_list = [
 	[
 	'lot_name' => 'DC Ply Mens 2016/2017 Snowboard',
 	'category' => 'Доски и лыжи',
-	'price' => '159999',
+	'price' => '15999',
 	'img_url' => 'img/lot-2.jpg',
 	'time_end' => '2019-12-02'
 	],
