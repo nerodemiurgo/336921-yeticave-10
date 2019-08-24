@@ -11,8 +11,8 @@ require_once('helpers.php');
 require_once('init.php');
 
 //Проверка ошибки при подключении БД
-if ($link == false) {
-	print('Ошибка подключения:' . mysqli_connect_error());
+if ($link === false) {
+	exit('Ошибка подключения:' . mysqli_connect_error());
 }
 
 //Объявляем массив с категориями

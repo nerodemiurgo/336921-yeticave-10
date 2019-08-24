@@ -25,7 +25,11 @@ function getCategories ($sql_link) {
 	$sql = 'SELECT id, name, code FROM category;';
 	$result = mysqli_query($sql_link, $sql);
 	
-	return $categories = mysqli_fetch_all($result, MYSQLI_ASSOC);
+		if ($result === false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($connect));
+		}
+	
+	return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
 //Функция для получения списка лотов
@@ -36,5 +40,9 @@ function getLots ($sql_link) {
 			ORDER BY created_at DESC;';
 	$result = mysqli_query($sql_link, $sql);
 	
-	return $lots_list = mysqli_fetch_all($result, MYSQLI_ASSOC);
+		if ($result === false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($connect));
+		}
+	
+	return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
