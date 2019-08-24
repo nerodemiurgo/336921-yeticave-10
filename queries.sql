@@ -120,7 +120,7 @@ SELECT name FROM category;
 SELECT l.name AS lot_name, c.name AS category_name, start_price, price, img FROM lot l
 JOIN category c
 ON l.category_id = c.id  WHERE dt_finish > NOW()
-ORDER BY created_at ASC;
+ORDER BY created_at DESC;
 
 /* Показать лот по его id */
 SELECT l.id, l.name AS lot_name, c.name AS category_name FROM lot l
@@ -135,4 +135,4 @@ WHERE id = '6';
 SELECT r.created_at, r.bid, l.name AS lot_name, u.user_name FROM rate r
 JOIN user u ON u.id = r.user_id
 JOIN lot l ON l.id = r.lot_id
-ORDER BY r.created_at ASC;
+ORDER BY r.created_at DESC;
