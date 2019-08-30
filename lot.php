@@ -1,4 +1,4 @@
-<?
+<?php
 //Подключаем функции
 require_once('functions.php');
 require_once('helpers.php');
@@ -29,10 +29,10 @@ if ($checkLotInfo == 0) {
 //Формирование массива и подключение шаблона лота
 $lot_page = include_template('lotpage.php', [
 	'categories' => $categories,
-	'lot_info' => $lot_info[0]
+	'lot_info' => $lot_info
 ]);
 }
 //Вывод лота, если его id существует
 if ($lot_info == true) {
 print ($lot_page);
-} 
+}

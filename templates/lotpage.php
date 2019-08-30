@@ -56,16 +56,10 @@
         </div>
         <div class="lot-item__right">
           <div class="lot-item__state">
-			<?php $timeend = timeuptoend($lot_info['dt_finish']);
-                if ($timeend[0] > 0): ?>
-					<div class="lot-item__timer timer">
+			<?php $timeend = timeuptoend($lot_info['dt_finish']);?>
+					<div class="lot-item__timer timer <?= $timeend[0] < 1 ? 'timer--finishing' : '' ?>">
 						<?=$timeend[0] . ':' . $timeend[1];?> 
-					</div>
-				<?php else : ?>
-					<div class="lot-item__timer timer timer--finishing">
-						<?=$timeend[0] . ':' . $timeend[1];?> 
-					</div>
-			<?php endif; ?>			
+					</div>		
             <div class="lot-item__cost-state">
               <div class="lot-item__rate">
                 <span class="lot-item__amount">Текущая цена</span>

@@ -26,7 +26,7 @@ function getCategories ($sql_link) {
 	$result = mysqli_query($sql_link, $sql);
 	
 		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($connect));
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
 		}
 	
 	return mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -41,29 +41,23 @@ function getLots ($sql_link) {
 	$result = mysqli_query($sql_link, $sql);
 	
 		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($connect));
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
 		}
 	
 	return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
 function getLot ($sql_link, $link_id) {
+	if ($link_id == '') {$link_id = 0;}
+	
 	$sql = 'SELECT l.name AS lot_name, c.name AS category_name, start_price, price, rate_step, img, description AS lot_desc, dt_finish, l.id AS lot_id FROM lot l
 			JOIN category c
 			ON l.category_id = c.id  WHERE l.id = '.$link_id.'';
-			
+	
 	$result = mysqli_query($sql_link, $sql);
-	
-/* 		if ($result === false) {
-		return false;
-		} else {
-			$getLot_arr = mysqli_fetch_all($result, MYSQLI_ASSOC);
-			return $getLot_arr[0];	
-		}
-		 */
-				if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($connect));
+		if ($result === false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
 		}
 	
-	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+	return mysqli_fetch_assoc($result);
 }
