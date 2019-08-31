@@ -35,4 +35,5 @@ $layout_content = include_template('layout.php', [
 	'content' => $page_content,
 	'is_auth' => $is_auth
 ]);
+
 print($layout_content);
