@@ -2,37 +2,35 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title><?=htmlspecialchars($lot_info['lot_name']); ?></title>
+  <title>Добавление лота</title>
   <link href="../css/normalize.min.css" rel="stylesheet">
   <link href="../css/style.css" rel="stylesheet">
+  <link href="../css/flatpickr.min.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="page-wrapper">
 
   <header class="main-header">
-    <div class="main-header__container container">
-      <h1 class="visually-hidden">YetiCave</h1>
-      <a class="main-header__logo" href="index.html">
-        <img src="../img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
-      </a>
-      <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru" autocomplete="off">
-        <input type="search" name="search" placeholder="Поиск лота">
-        <input class="main-header__search-btn" type="submit" name="find" value="Найти">
-      </form>
-      <a class="main-header__add-lot button" href="add-lot.html">Добавить лот</a>
-      <nav class="user-menu">
-        <ul class="user-menu__list">
-          <li class="user-menu__item">
-            <a href="sign-up.html">Регистрация</a>
-          </li>
-          <li class="user-menu__item">
-            <a href="login.html">Вход</a>
-          </li>
-        </ul>
-      </nav>
-    </div>
-  </header>
+  <div class="main-header__container container">
+    <h1 class="visually-hidden">YetiCave</h1>
+    <a class="main-header__logo" href="index.html">
+      <img src="../img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
+    </a>
+    <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru" autocomplete="off">
+      <input type="search" name="search" placeholder="Поиск лота">
+      <input class="main-header__search-btn" type="submit" name="find" value="Найти">
+    </form>
+    <a class="main-header__add-lot button" href="add-lot.html">Добавить лот</a>
+    <nav class="user-menu">
+      <div class="user-menu__logged">
+        <p>#user_name#</p>
+        <a class="user-menu__bets" href="my-bets.html">Мои ставки</a>
+        <a class="user-menu__logout" href="#">Выход</a>
+      </div>
+    </nav>
+  </div>
+</header>
 
   <main>
     <nav class="nav">
@@ -44,112 +42,71 @@
 			<?php endforeach; ?>
       </ul>
     </nav>
-    <section class="lot-item container">
-      <h2><?=htmlspecialchars($lot_info['lot_name']); ?></h2>
-      <div class="lot-item__content">
-        <div class="lot-item__left">
-          <div class="lot-item__image">
-            <img src="../<?=htmlspecialchars($lot_info['img']); ?>" width="730" height="548" alt="<?=htmlspecialchars($lot_info['lot_name']); ?>">
-          </div>
-          <p class="lot-item__category">Категория: <span><?=htmlspecialchars($lot_info['category_name']); ?></span></p>
-          <p class="lot-item__description"><?=htmlspecialchars($lot_info['lot_desc']); ?></p>
+    <form class="form form--add-lot container form--invalid" action="/add.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
+      <h2>Добавление лота</h2>
+      <div class="form__container-two">
+        <div class="form__item form__item--invalid"> <!-- form__item--invalid -->
+          <label for="name">Наименование <sup>*</sup></label>
+          <input id="name" type="text" name="name" placeholder="Введите наименование лота">
+          <span class="form__error">Введите наименование лота</span>
         </div>
-        <div class="lot-item__right">
-          <div class="lot-item__state">
-			<?php $timeend = timeuptoend($lot_info['dt_finish']);?>
-					<div class="lot-item__timer timer <?= $timeend[0] < 1 ? 'timer--finishing' : '' ?>">
-						<?=$timeend[0] . ':' . $timeend[1];?> 
-					</div>		
-            <div class="lot-item__cost-state">
-              <div class="lot-item__rate">
-                <span class="lot-item__amount">Текущая цена</span>
-                <span class="lot-item__cost"><?=decorate_price(htmlspecialchars($lot_info['price'])); ?></span>
-              </div>
-              <div class="lot-item__min-cost">
-                Мин. ставка <span><?=decorate_price(htmlspecialchars($lot_info['rate_step'])); ?></span>
-              </div>
-            </div>
-            <form class="lot-item__form" action="https://echo.htmlacademy.ru" method="post" autocomplete="off">
-              <p class="lot-item__form-item form__item form__item--invalid">
-                <label for="cost">Ваша ставка</label>
-                <input id="cost" type="text" name="cost" placeholder="12 000">
-                <span class="form__error">Введите наименование лота</span>
-              </p>
-              <button type="submit" class="button">Сделать ставку</button>
-            </form>
-          </div>
-          <div class="history">
-            <h3>История ставок (<span>10</span>)</h3>
-            <table class="history__list">
-              <tr class="history__item">
-                <td class="history__name">Иван</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">5 минут назад</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Константин</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">20 минут назад</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Евгений</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">Час назад</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Игорь</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">19.03.17 в 08:21</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Енакентий</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">19.03.17 в 13:20</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Семён</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">19.03.17 в 12:20</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Илья</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">19.03.17 в 10:20</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Енакентий</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">19.03.17 в 13:20</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Семён</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">19.03.17 в 12:20</td>
-              </tr>
-              <tr class="history__item">
-                <td class="history__name">Илья</td>
-                <td class="history__price">10 999 р</td>
-                <td class="history__time">19.03.17 в 10:20</td>
-              </tr>
-            </table>
-          </div>
+        <div class="form__item">
+          <label for="category">Категория <sup>*</sup></label>
+          <select id="category" name="category">
+			<?php foreach ($categories as $item): ?>
+					<option value="<?=$item['id']?>"><?=htmlspecialchars($item['name']); ?></option>
+			<?php endforeach; ?>
+          </select>
+          <span class="form__error">Выберите категорию</span>
         </div>
       </div>
-    </section>
+      <div class="form__item form__item--wide">
+        <label for="description">Описание <sup>*</sup></label>
+        <textarea id="description" name="description" placeholder="Напишите описание лота"></textarea>
+        <span class="form__error">Напишите описание лота</span>
+      </div>
+      <div class="form__item form__item--file">
+        <label>Изображение <sup>*</sup></label>
+        <div class="form__input-file">
+          <input class="visually-hidden" type="file" id="lot-img" name="lot-img" value="">
+          <label for="lot-img">
+            Добавить
+          </label>
+        </div>
+      </div>
+      <div class="form__container-three">
+        <div class="form__item form__item--small">
+          <label for="start_price">Начальная цена <sup>*</sup></label>
+          <input id="start_price" type="text" name="start_price" placeholder="0">
+          <span class="form__error">Введите начальную цену</span>
+        </div>
+        <div class="form__item form__item--small">
+          <label for="rate_step">Шаг ставки <sup>*</sup></label>
+          <input id="rate_step" type="text" name="rate_step" placeholder="0">
+          <span class="form__error">Введите шаг ставки</span>
+        </div>
+        <div class="form__item">
+          <label for="dt_finish">Дата окончания торгов <sup>*</sup></label>
+          <input class="form__input-date" id="dt_finish" type="text" name="dt_finish" placeholder="Введите дату в формате ГГГГ-ММ-ДД">
+          <span class="form__error">Введите дату завершения торгов</span>
+        </div>
+      </div>
+      <span class="form__error form__error--bottom">Пожалуйста, исправьте ошибки в форме.</span>
+      <button type="submit" class="button">Добавить лот</button>
+    </form>
   </main>
 
 </div>
 
 <footer class="main-footer">
   <nav class="nav">
-   <ul class="nav__list container">
-            <!--заполните этот список из массива категорий-->
+    <ul class="nav__list container">
 			<?php foreach ($categories as $item): ?>
 				<li class="nav__item">
 					<a href="pages/all-lots.html"><?=htmlspecialchars($item['name']); ?></a>
 				</li>
 			<?php endforeach; ?>
-        </ul>
+    </ul>
   </nav>
   <div class="main-footer__bottom container">
     <div class="main-footer__copyright">
@@ -193,5 +150,7 @@
   </div>
 </footer>
 
+<script src="../flatpickr.js"></script>
+<script src="../script.js"></script>
 </body>
 </html>
