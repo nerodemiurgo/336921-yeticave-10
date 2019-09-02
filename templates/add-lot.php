@@ -47,7 +47,7 @@
       <div class="form__container-two">
         <div class="form__item form__item--invalid"> <!-- form__item--invalid -->
           <label for="name">Наименование <sup>*</sup></label>
-          <input id="name" type="text" name="name" placeholder="Введите наименование лота">
+          <input id="name" type="text" name="name" value="<?=getPostVal('name'); ?>" placeholder="Введите наименование лота">
           <span class="form__error">Введите наименование лота</span>
         </div>
         <div class="form__item">
@@ -62,7 +62,7 @@
       </div>
       <div class="form__item form__item--wide">
         <label for="description">Описание <sup>*</sup></label>
-        <textarea id="description" name="description" placeholder="Напишите описание лота"></textarea>
+        <textarea id="description" name="description" placeholder="Напишите описание лота"><?=getPostVal('description'); ?></textarea>
         <span class="form__error">Напишите описание лота</span>
       </div>
       <div class="form__item form__item--file">
@@ -77,17 +77,17 @@
       <div class="form__container-three">
         <div class="form__item form__item--small">
           <label for="start_price">Начальная цена <sup>*</sup></label>
-          <input id="start_price" type="text" name="start_price" placeholder="0">
+          <input id="start_price" type="text" name="start_price" value="<?=getPostVal('start_price'); ?>" placeholder="0">
           <span class="form__error">Введите начальную цену</span>
         </div>
         <div class="form__item form__item--small">
           <label for="rate_step">Шаг ставки <sup>*</sup></label>
-          <input id="rate_step" type="text" name="rate_step" placeholder="0">
+          <input id="rate_step" type="text" name="rate_step" value="<?=getPostVal('rate_step'); ?>" placeholder="0">
           <span class="form__error">Введите шаг ставки</span>
         </div>
         <div class="form__item">
           <label for="dt_finish">Дата окончания торгов <sup>*</sup></label>
-          <input class="form__input-date" id="dt_finish" type="text" name="dt_finish" placeholder="Введите дату в формате ГГГГ-ММ-ДД">
+          <input class="form__input-date" id="dt_finish" type="text" name="dt_finish" value="<?=getPostVal('dt_finish'); ?>" placeholder="Введите дату в формате ГГГГ-ММ-ДД">
           <span class="form__error">Введите дату завершения торгов</span>
         </div>
       </div>
