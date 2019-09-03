@@ -126,6 +126,7 @@ function validateFilled($name) {
 
 //Проверка начальной цены
 function validateStartPrice($start_price) {
+	$start_price = $_POST[$start_price] ?? 0;
 	if ($start_price <= 0) {
 		return "Стартовая цена должна быть больше нуля";
 	}
@@ -134,6 +135,7 @@ function validateStartPrice($start_price) {
 
 //Проверка даты завершения
 function validateDtFinish($dt_finish) {
+	$dt_finish = $_POST[$dt_finish] ?? 0;
 	$date = is_date_valid($dt_finish);
 	$now = time();
 	if ($date == true) {
@@ -152,7 +154,8 @@ function validateDtFinish($dt_finish) {
 
 //Проверка шага ставки
 function validateRateStep($rate_step) {
-	$checkRateStep = is_int($rate_step);
+	$rate_step = $_POST[$rate_step] ?? 0;
+	$checkRateStep = ctype_digit($rate_step);
 	if ($checkRateStep == true) {
 		if ($rate_step > 0) {
 		return null;

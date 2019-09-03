@@ -5,19 +5,14 @@ require_once('helpers.php');
 require_once('init.php');
 
 //Объявляем массив с категориями
-$categories = getCategories($link);
+	$categories = getCategories($link);
 
-	//Объявляем массив ошибок и обязательных полей
+//Объявляем массив ошибок и обязательных полей
 	$required = ['name', 'category', 'description', 'lot-img', 'start_price', 'rate_step', 'dt_finish'];
 	$errors = [];
 
-//Включаем шаблон страницы добавления лота
-$add_page = include_template('add-lot.php', [
-	'categories' => $categories
-]);
-
 //Проверка, что форма была отправлена
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	//Копируем все данные из массива POST
 	$newlot = $_POST;
 	
@@ -35,11 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	];
 	
 	//Проверка поля на заполненность
- 	    foreach ($required as $key) {
-    if (empty($_POST[$key])) {
+ 	foreach ($required as $key) {
+		if (empty($_POST[$key])) {
             $errors[$key] = 'Это поле надо заполнить';
-    }
-  }
+		}
+	}
 
     foreach ($_POST as $key => $value) {
         if (!isset($errors[$key]) && isset($rules[$key])) {
@@ -53,50 +48,45 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 	//Переменные цены, автора
 	$newlot['price'] = $newlot['start_price'];
 	$newlot['author_id'] = 1;	
-	
-	
-	//Валидация изображения
-	$imgCheck = isset($_FILES['lot-img']['name']);
-	if (isset($_FILES['lot-img']['name'])) {
-		$tmp_name = $_FILES['lot-img']['tmp_name'];
-		$finfo = finfo_open(FILEINFO_MIME_TYPE);
-		$file_type = finfo_file($finfo, $tmp_name);
-		
-			if ($file_type == "image/jpeg") {
-				$filename = uniqid().'.jpg';
-				$newlot['lot-img'] = $filename;
-				move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/'.$filename);	
-			} else if ($file_type == "image/png"){
-				$filename = uniqid().'.png';
-				$newlot['lot-img'] = $filename;
-				move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/'.$filename);	
-			} else {
-				$newlot['lot-img'] = null;
-				$errors['img'] = 'Загрузите картинку в формате jpeg или png';
-			}
-	} else {
-		$newlot['lot-img'] = null;
-		$errors['img'] = 'Вы не загрузили изображение';
-		}
 
+	if (empty($errors)) {
+	//Валидация изображения
+		if (isset($_FILES['lot-img']['error']) && isset($_FILES['lot-img']['error']) === UPLOAD_ERR_NO_FILE) {
+		  $errors['img'] = 'Вы не загрузили изображение';
+		} elseif (isset($_FILES['lot-img']['error']) && isset($_FILES['lot-img']['error']) !== UPLOAD_ERR_OK) {
+		  $errors['img'] = 'Не удалось загрузить изображение';
+		} else {
+			$tmp_name = $_FILES['lot-img']['tmp_name'];
+			$finfo = finfo_open(FILEINFO_MIME_TYPE);
+			$file_type = finfo_file($finfo, $tmp_name);
+					
+				if ($file_type == "image/jpeg") {
+					$filename = uniqid().'.jpg';
+					$newlot['lot-img'] = $filename;
+					move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/'.$filename);	
+				} elseif ($file_type == "image/png"){
+					$filename = uniqid().'.png';
+					$newlot['lot-img'] = $filename;
+					move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/'.$filename);	
+				}
+		}
 	//Проверяем массив данных и отправляем его в БД
 	$res = createLot($link, $newlot['name'], $newlot['description'], $newlot['start_price'], $newlot['price'], $newlot['dt_finish'], $newlot['rate_step'], $newlot['category'], $newlot['lot-img'], $newlot['author_id']);
 	
 	if ($res) {
             $newlot_id = mysqli_insert_id($link);
-            header("Location: lot.php?id=" . $newlot_id);
+            header("Location: /lot.php?id=" . $newlot_id);
 			print ($newlot_id = mysqli_insert_id($link));
         } else {
 		print (mysqli_error($link));	
-		}
-		
-	
-		if (count($errors)) 
-	{
+		} 
+	} 
+}
+
 	$add_page = include_template('add-lot.php', [
 	'categories' => $categories,
 	'errors' => $errors
 	]);
-	}
-} 
+	
 print ($add_page);
+var_dump ($_FILES);
