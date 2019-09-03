@@ -8,7 +8,7 @@ require_once('init.php');
 	$categories = getCategories($link);
 
 //Объявляем массив ошибок и обязательных полей
-	$required = ['name', 'category', 'description', 'lot-img', 'start_price', 'rate_step', 'dt_finish'];
+	$required = ['name', 'category', 'description', 'start_price', 'rate_step', 'dt_finish'];
 	$errors = [];
 
 //Проверка, что форма была отправлена
@@ -51,9 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 	if (empty($errors)) {
 	//Валидация изображения
-		if (isset($_FILES['lot-img']['error']) && isset($_FILES['lot-img']['error']) === UPLOAD_ERR_NO_FILE) {
+		if (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] === UPLOAD_ERR_NO_FILE) {
 		  $errors['lot-img'] = 'Вы не загрузили изображение';
-		} elseif (isset($_FILES['lot-img']['error']) && isset($_FILES['lot-img']['error']) !== UPLOAD_ERR_OK) {
+		} elseif (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] !== UPLOAD_ERR_OK) {
 		  $errors['lot-img'] = 'Не удалось загрузить изображение';
 		} else {
 			$tmp_name = $_FILES['lot-img']['tmp_name'];
@@ -68,16 +68,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					$filename = uniqid().'.png';
 					$newlot['lot-img'] = $filename;
 					move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/'.$filename);	
+				} else {
+					$errors['lot-img'] = 'Изображение должно быть формата jpg или png';
 				}
 		}
+	}
+	
 	//Проверяем массив данных и отправляем его в БД
-	$res = createLot($link, $newlot['name'], $newlot['description'], $newlot['start_price'], $newlot['price'], $newlot['dt_finish'], $newlot['rate_step'], $newlot['category'], $newlot['lot-img'], $newlot['author_id']);
+	if (empty($errors)) {	
+		$res = createLot($link, $newlot['name'], $newlot['description'], $newlot['start_price'], $newlot['price'], $newlot['dt_finish'], $newlot['rate_step'], $newlot['category'], $newlot['lot-img'], $newlot['author_id']);
 	
 	if ($res) {
-            $newlot_id = mysqli_insert_id($link);
-            header("Location: /lot.php?id=" . $newlot_id);
+			$newlot_id = mysqli_insert_id($link);
+			header("Location: /lot.php?id=" . $newlot_id);
 			print ($newlot_id = mysqli_insert_id($link));
-        } else {
+		} else {
 		print (mysqli_error($link));	
 		} 
 	} 

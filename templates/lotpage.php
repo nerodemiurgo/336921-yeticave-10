@@ -49,7 +49,7 @@
       <div class="lot-item__content">
         <div class="lot-item__left">
           <div class="lot-item__image">
-            <img src="../uploads/<?=htmlspecialchars($lot_info['img']); ?>" width="730" height="548" alt="<?=htmlspecialchars($lot_info['lot_name']); ?>">
+            <img src="/uploads/<?=htmlspecialchars($lot_info['img']); ?>" width="730" height="548" alt="<?=htmlspecialchars($lot_info['lot_name']); ?>">
           </div>
           <p class="lot-item__category">Категория: <span><?=htmlspecialchars($lot_info['category_name']); ?></span></p>
           <p class="lot-item__description"><?=htmlspecialchars($lot_info['lot_desc']); ?></p>

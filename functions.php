@@ -153,7 +153,7 @@ function validateDtFinish($dt_finish) {
 }
 
 //Проверка шага ставки
-function validateRateStep($rate_step) {
+/* function validateRateStep($rate_step) {
 	$rate_step = $_POST[$rate_step] ?? 0;
 	$checkRateStep = ctype_digit($rate_step);
 	if ($checkRateStep == true) {
@@ -161,10 +161,33 @@ function validateRateStep($rate_step) {
 		return null;
 		}
 		if ($rate_step == 0) {
-		return "Шаг ставки не может быть равен нулю";
+		return "Шаг ставки не может быть равен нулю или быть отрицательным числом";
 		}
 	}
 		if ($checkRateStep == false) {
 		return "Шаг ставки должен быть целым числом";
 		}
+	} */
+	
+	
+	//Проверка шага ставки
+function validateRateStep($rate_step) {
+	$rate_step = $_POST[$rate_step] ?? 0;
+	if ($rate_step < 0 ) {
+		return "Шаг ставки не может быть отрицательным числом";
+	} else {	
+		$checkRateStep = ctype_digit($rate_step);
+		
+		if ($checkRateStep == true) {
+			if ($rate_step > 0) {
+			return null;
+			}
+			if ($rate_step == 0) {
+			return "Шаг ставки не может быть равен нулю";
+			}
+		}
+			if ($checkRateStep == false) {
+			return "Шаг ставки должен быть целым числом";
+			}
 	}
+}
