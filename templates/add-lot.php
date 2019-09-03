@@ -71,7 +71,7 @@
 			 <span class="form__error"><?= $errors['description'] ?></span>
 		  <?php endif; ?>
       </div>
-      <div class="form__item form__item--file">
+      <div class="form__item form__item--file <?= empty($errors['lot-img']) ?: 'form__item--invalid' ?>"">
         <label>Изображение <sup>*</sup></label>
         <div class="form__input-file">
           <input class="visually-hidden" type="file" id="lot-img" name="lot-img" value="">
@@ -79,8 +79,8 @@
             Добавить
           </label>
         </div>
-		<?php if (isset($errors['img'])) : ?> <!-- Вывод ошибок по картинкам -->
-			 <span class="form__error"><?= $errors['img'] ?></span>
+		<?php if (isset($errors['lot-img'])) : ?> <!-- Вывод ошибок по картинкам -->
+			 <span class="form__error"><?= $errors['lot-img'] ?></span>
 		<?php endif; ?>
       </div>
       <div class="form__container-three">

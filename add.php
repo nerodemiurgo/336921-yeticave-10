@@ -52,9 +52,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	if (empty($errors)) {
 	//Валидация изображения
 		if (isset($_FILES['lot-img']['error']) && isset($_FILES['lot-img']['error']) === UPLOAD_ERR_NO_FILE) {
-		  $errors['img'] = 'Вы не загрузили изображение';
+		  $errors['lot-img'] = 'Вы не загрузили изображение';
 		} elseif (isset($_FILES['lot-img']['error']) && isset($_FILES['lot-img']['error']) !== UPLOAD_ERR_OK) {
-		  $errors['img'] = 'Не удалось загрузить изображение';
+		  $errors['lot-img'] = 'Не удалось загрузить изображение';
 		} else {
 			$tmp_name = $_FILES['lot-img']['tmp_name'];
 			$finfo = finfo_open(FILEINFO_MIME_TYPE);
@@ -89,4 +89,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	]);
 	
 print ($add_page);
-var_dump ($_FILES);
