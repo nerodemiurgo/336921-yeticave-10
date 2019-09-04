@@ -21,7 +21,7 @@ $categories = getCategories($link);
 //Объявляем двумерный массив с объявлениями
 $lots_list = getLots($link);
 
-//Включаем шаблон страницы
+//Включаем шаблон главной страницы
 $page_content = include_template('main.php', [
 	'categories' => $categories,
 	'lots_list' => $lots_list

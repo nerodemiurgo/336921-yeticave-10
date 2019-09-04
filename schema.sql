@@ -15,7 +15,7 @@ CREATE TABLE lot (
 	dt_finish DATE NOT NULL,
 	rate_step INT NOT NULL,
 	category_id INT NOT NULL,
-	autor_id INT NOT NULL,
+	author_id INT NOT NULL,
 	winner_id INT
 );
 
