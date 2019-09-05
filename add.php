@@ -81,7 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	if ($res) {
 			$newlot_id = mysqli_insert_id($link);
 			header("Location: /lot.php?id=" . $newlot_id);
-			print ($newlot_id = mysqli_insert_id($link));
 		} else {
 		print (mysqli_error($link));	
 		} 

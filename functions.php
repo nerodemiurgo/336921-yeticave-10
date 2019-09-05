@@ -32,6 +32,18 @@ function getCategories ($sql_link) {
 	return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
+//Функция для получения списка юзеров
+function getUsers ($sql_link) {
+	$sql = 'SELECT id, user_name, email, password, avatar, contact FROM user;';
+	$result = mysqli_query($sql_link, $sql);
+	
+		if ($result === false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
+		}
+	
+	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
 //Функция для получения списка лотов
 function getLots ($sql_link) {
 	$sql = 'SELECT l.name AS lot_name, c.name AS category_name, start_price, price, img, dt_finish, l.id AS lot_id FROM lot l
@@ -111,6 +123,33 @@ SQL;
     );
 }
 
+//Функция для создания юзера
+function createUser(
+	$connection,
+	$email,
+	$password,
+	$user_name,
+	$contact
+) {
+    $sql = <<<SQL
+INSERT INTO user
+    (email, password, user_name, contact)
+VALUES
+    (?, ?, ?, ?)
+SQL;
+
+    return db_insert_data(
+        $connection,
+        $sql,
+        [
+            $email,
+            $password,
+            $user_name,
+            $contact
+        ]
+    );
+}
+
 //Функция сохранения заполненных значений формы
 function getPostVal($name) {
 	return $_POST[$name] ?? '';
@@ -151,24 +190,6 @@ function validateDtFinish($dt_finish) {
 		return "Формат даты должен быть ГГГГ-ММ-ДД";
 	}
 }
-
-//Проверка шага ставки
-/* function validateRateStep($rate_step) {
-	$rate_step = $_POST[$rate_step] ?? 0;
-	$checkRateStep = ctype_digit($rate_step);
-	if ($checkRateStep == true) {
-		if ($rate_step > 0) {
-		return null;
-		}
-		if ($rate_step == 0) {
-		return "Шаг ставки не может быть равен нулю или быть отрицательным числом";
-		}
-	}
-		if ($checkRateStep == false) {
-		return "Шаг ставки должен быть целым числом";
-		}
-	} */
-	
 	
 	//Проверка шага ставки
 function validateRateStep($rate_step) {
@@ -189,5 +210,16 @@ function validateRateStep($rate_step) {
 			if ($checkRateStep == false) {
 			return "Шаг ставки должен быть целым числом";
 			}
+	}
+}
+
+//Проверка корректности email
+function validateEmail($email) {
+	$email = $_POST[$email] ?? 0;
+	if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+		return null;
+	} 
+	else {
+		return "Формат email должен соответствовать example@email.com";
 	}
 }
