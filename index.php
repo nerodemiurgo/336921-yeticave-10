@@ -1,8 +1,4 @@
 <?php
-$is_auth = rand(0, 1);
-
-$user_name = 'Ольга'; // укажите здесь ваше имя
-
 $title = 'YetiCave - заголовок страницы';
 
 //Подключаем функции
@@ -31,9 +27,7 @@ $page_content = include_template('main.php', [
 $layout_content = include_template('layout.php', [
 	'title' => $title,
 	'categories' => $categories,
-	'user_name' => $user_name,
-	'content' => $page_content,
-	'is_auth' => $is_auth
+	'content' => $page_content
 ]);
 
 print($layout_content);

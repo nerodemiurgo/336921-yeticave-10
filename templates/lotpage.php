@@ -21,16 +21,24 @@
         <input class="main-header__search-btn" type="submit" name="find" value="Найти">
       </form>
       <a class="main-header__add-lot button" href="add-lot.html">Добавить лот</a>
-      <nav class="user-menu">
-        <ul class="user-menu__list">
-          <li class="user-menu__item">
-            <a href="sign-up.php">Регистрация</a>
-          </li>
-          <li class="user-menu__item">
-            <a href="login.html">Вход</a>
-          </li>
-        </ul>
-      </nav>
+        <nav class="user-menu">
+			<?php if (!empty($_SESSION)) : ?>
+				<div class="user-menu__logged">
+					<p><?=$_SESSION['user']['user_name'];?></p>
+					<a class="user-menu__bets" href="pages/my-bets.html">Мои ставки</a>
+					<a class="user-menu__logout" href="/logout.php">Выход</a>
+				</div>
+			<?php else : ?>
+				<ul class="user-menu__list">
+					<li class="user-menu__item">
+					  <a href="/sign-up.php">Регистрация</a>
+					</li>
+					<li class="user-menu__item">
+					  <a href="/enter.php">Вход</a>
+					</li>
+				</ul
+			<?php endif; ?>
+        </nav>
     </div>
   </header>
 
@@ -55,6 +63,7 @@
           <p class="lot-item__description"><?=htmlspecialchars($lot_info['lot_desc']); ?></p>
         </div>
         <div class="lot-item__right">
+		  <?php if (!empty($_SESSION)) : ?>
           <div class="lot-item__state">
 			<?php $timeend = timeuptoend($lot_info['dt_finish']);?>
 					<div class="lot-item__timer timer <?= $timeend[0] < 1 ? 'timer--finishing' : '' ?>">
@@ -78,6 +87,7 @@
               <button type="submit" class="button">Сделать ставку</button>
             </form>
           </div>
+		  <?php endif; ?>
           <div class="history">
             <h3>История ставок (<span>10</span>)</h3>
             <table class="history__list">
