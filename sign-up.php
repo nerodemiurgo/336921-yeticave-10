@@ -1,8 +1,15 @@
 <?php
+
 //Подключаем функции
 require_once('functions.php');
 require_once('helpers.php');
 require_once('init.php');
+
+if (!empty($_SESSION)) {
+	header("HTTP/1.0 403 (Forbidden, доступ запрещен");
+	exit;
+}
+
 
 //Объявляем массив с категориями
 	$categories = getCategories($link);
@@ -41,6 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 	
 	//Проверка email на наличие в базе
+	if (!isset($errors['email'])) {
 		$email = $_POST['email'];
 		$checkemail = mysqli_real_escape_string($link, $email);
         $sql = "SELECT id FROM user WHERE email = '$checkemail'";
@@ -49,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (mysqli_num_rows($res) > 0) {
             $errors['email'] = 'Пользователь с этим email уже зарегистрирован';
         }
-
+	}
 	$errors = array_filter($errors);	
 	 
 	if (empty ($errors)) {
@@ -57,11 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$newpass = password_hash($_POST['password'], PASSWORD_DEFAULT);
 				
 		//Проверяем массив данных и отправляем его в БД	
-		$res = createUser($link, $newuser['email'], $newpass, $newuser['user_name'], $newuser['contact']);
+		$result = createUser($link, $newuser['email'], $newpass, $newuser['user_name'], $newuser['contact']);
 		
-			if ($res) {
+			if ($result) {
 			$newuser_id = mysqli_insert_id($link);
 			header('Location: /');
+			exit;
 			} else {
 			print (mysqli_error($link));	
 			} 

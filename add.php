@@ -4,6 +4,12 @@ require_once('functions.php');
 require_once('helpers.php');
 require_once('init.php');
 
+if (empty($_SESSION)) {
+	header("HTTP/1.0 403 (Forbidden, доступ запрещен");
+	exit;
+}
+
+
 //Объявляем массив с категориями
 	$categories = getCategories($link);
 
@@ -47,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	
 	//Переменные цены, автора
 	$newlot['price'] = $newlot['start_price'];
-	$newlot['author_id'] = 1;	
+	$newlot['author_id'] = $_SESSION['user']['id'];	
 
 	if (empty($errors)) {
 	//Валидация изображения
