@@ -1,10 +1,8 @@
 <?php
 //Подключаем функции
-require_once('functions.php');
-require_once('helpers.php');
 require_once('init.php');
 
-if (empty($_SESSION)) {
+if (empty($_SESSION['user'])) {
 	header("HTTP/1.0 403 (Forbidden, доступ запрещен");
 	exit;
 }

@@ -1,7 +1,5 @@
 <?php
 //Подключаем функции
-require_once('functions.php');
-require_once('helpers.php');
 require_once('init.php');
 
 //Объявляем массив с категориями

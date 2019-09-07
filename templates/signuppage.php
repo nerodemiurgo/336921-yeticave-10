@@ -20,11 +20,11 @@
         <input type="search" name="search" placeholder="Поиск лота">
         <input class="main-header__search-btn" type="submit" name="find" value="Найти">
       </form>
-      <a class="main-header__add-lot button" href="add.php">Добавить лот</a>
+      <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
       <nav class="user-menu">
         <ul class="user-menu__list">
           <li class="user-menu__item">
-            <a href="sign-up.php">Регистрация</a>
+            <a href="/sign-up.php">Регистрация</a>
           </li>
           <li class="user-menu__item">
             <a href="/enter.php">Вход</a>

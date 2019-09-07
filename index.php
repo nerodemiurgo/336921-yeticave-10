@@ -2,8 +2,6 @@
 $title = 'YetiCave - заголовок страницы';
 
 //Подключаем функции
-require_once('functions.php');
-require_once('helpers.php');
 require_once('init.php');
 
 //Проверка ошибки при подключении БД

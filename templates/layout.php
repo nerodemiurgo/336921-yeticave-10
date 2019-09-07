@@ -22,10 +22,10 @@
         <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
 
         <nav class="user-menu">
-			<?php if (!empty($_SESSION)) : ?>
+			<?php if (!empty($_SESSION['user'])) : ?>
 				<div class="user-menu__logged">
 					<p><?=$_SESSION['user']['user_name'];?></p>
-					<a class="user-menu__bets" href="pages/my-bets.html">Мои ставки</a>
+					<a class="user-menu__bets" href="/bets.php">Мои ставки</a>
 					<a class="user-menu__logout" href="/logout.php">Выход</a>
 				</div>
 			<?php else : ?>

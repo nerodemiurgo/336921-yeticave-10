@@ -1,5 +1,4 @@
 <?php
-require_once('init.php');
 date_default_timezone_set("Europe/Moscow");
 
 //Функция оформления цены
@@ -155,14 +154,6 @@ function getPostVal($name) {
 	return $_POST[$name] ?? '';
 }
 
-//Функция проверки заполненности поля
-function validateFilled($name) {
-	if (empty($_POST[$name])) {
-		return 'Это поле должно быть заполнено';
-	}
-	return null;
-}
-
 //Проверка начальной цены
 function validateStartPrice($start_price) {
 	$start_price = $_POST[$start_price] ?? 0;
@@ -213,6 +204,34 @@ function validateRateStep($rate_step) {
 	}
 }
 
+	//Проверка ставки
+function validateRate($new_rate, $price, $rate_step) {
+	$new_rate = $_POST['bid'] ?? 0;
+	if ($new_rate < 0 ) {
+		return "Ставка не может быть отрицательным числом";
+	} else {	
+		$checkNewRate = ctype_digit($new_rate);
+		
+			if ($checkNewRate == true) {
+				if ($new_rate > 0) {
+						$new_price = $price+$rate_step;
+					if ($new_rate < $new_price) {
+						return "Ставка не должна быть меньше $new_price";
+					}
+					if ($new_rate >= $new_price) {
+						return null;
+					}
+				}
+				if ($new_rate == 0) {
+				return "Ставка не может быть равна нулю";
+				}
+			}
+			if ($checkNewRate == false) {
+			return "Ставка должна быть целым числом";
+			}
+	}
+}
+
 //Проверка корректности email
 function validateEmail($email) {
 	$email = $_POST[$email] ?? 0;
@@ -222,4 +241,23 @@ function validateEmail($email) {
 	else {
 		return "Формат email должен соответствовать example@email.com";
 	}
+}
+
+//Функция для получения истории ставок
+function getHistoryRates ($sql_link, $lot_id) {
+	$lot_id = $_GET['id'] ?? 0;
+	$sql = 'SELECT r.created_at AS time, r.bid AS bid, r.user_id AS user_id, r.lot_id FROM rate r
+			JOIN user u
+			ON r.user_id = u.id
+			WHERE r.lot_id = '.$lot_id.'
+			ORDER BY time DESC LIMIT 10
+			
+			;';
+	$result = mysqli_query($sql_link, $sql);
+	
+		if ($result === false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
+		}
+	
+	return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }

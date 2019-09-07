@@ -2,35 +2,36 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Добавление лота</title>
+  <title>Мои ставки</title>
   <link href="../css/normalize.min.css" rel="stylesheet">
   <link href="../css/style.css" rel="stylesheet">
-  <link href="../css/flatpickr.min.css" rel="stylesheet">
 </head>
 <body>
 
 <div class="page-wrapper">
 
   <header class="main-header">
-  <div class="main-header__container container">
-    <h1 class="visually-hidden">YetiCave</h1>
-    <a class="main-header__logo" href="/">
-      <img src="../img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
-    </a>
-    <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru" autocomplete="off">
-      <input type="search" name="search" placeholder="Поиск лота">
-      <input class="main-header__search-btn" type="submit" name="find" value="Найти">
-    </form>
-    <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
-        <nav class="user-menu">
-			<div class="user-menu__logged">
-				<p><?=$_SESSION['user']['user_name'];?></p>
-				<a class="user-menu__bets" href="/bets.php">Мои ставки</a>
-				<a class="user-menu__logout" href="/logout.php">Выход</a>
-			</div>
-        </nav>
-  </div>
-</header>
+    <div class="main-header__container container">
+      <h1 class="visually-hidden">YetiCave</h1>
+      <a class="main-header__logo" href="/">
+        <img src="../img/logo.svg" width="160" height="39" alt="Логотип компании YetiCave">
+      </a>
+      <form class="main-header__search" method="get" action="https://echo.htmlacademy.ru" autocomplete="off">
+        <input type="search" name="search" placeholder="Поиск лота">
+        <input class="main-header__search-btn" type="submit" name="find" value="Найти">
+      </form>
+      <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
+			<nav class="user-menu">
+				<?php if (!empty($_SESSION['user'])) : ?>
+					<div class="user-menu__logged">
+						<p><?=$_SESSION['user']['user_name'];?></p>
+						<a class="user-menu__bets" href="/bets.php">Мои ставки</a>
+						<a class="user-menu__logout" href="/logout.php">Выход</a>
+					</div>
+				<?php endif; ?>
+			</nav>
+    </div>
+  </header>
 
   <main>
     <nav class="nav">
@@ -42,88 +43,167 @@
 			<?php endforeach; ?>
       </ul>
     </nav>
-    <form class="form form--add-lot container <?= empty($errors) ?: 'form--invalid' ?>" action="/add.php" method="post" enctype="multipart/form-data"> <!-- form--invalid -->
-      <h2>Добавление лота</h2>
-      <div class="form__container-two">
-        <div class="form__item <?= empty($errors['name']) ?: 'form__item--invalid' ?>"> <!-- form__item--invalid -->
-          <label for="name">Наименование <sup>*</sup></label>
-          <input id="name" type="text" name="name" value="<?=getPostVal('name'); ?>" placeholder="Введите наименование лота">
-          <?php if (isset($errors['name'])) : ?>
-			 <span class="form__error"><?= $errors['name'] ?></span>
-		  <?php endif; ?>
-        </div>
-        <div class="form__item <?= empty($errors['categories']) ?: 'form__item--invalid' ?>">
-          <label for="category">Категория <sup>*</sup></label>
-          <select id="category" name="category">
-			<?php foreach ($categories as $item): ?>
-				<option value="<?=$item['id']?>" <?= $item['id'] === getPostVal('category') ? 'checked' : '' ?>><?=htmlspecialchars($item['name']); ?></option>
-			<?php endforeach; ?>
-          </select>
-          <?php if (isset($errors['categories'])) : ?>
-			 <span class="form__error"><?= $errors['categories'] ?></span>
-		  <?php endif; ?>
-        </div>
-      </div>
-      <div class="form__item form__item--wide <?= empty($errors['description']) ?: 'form__item--invalid' ?>">
-        <label for="description">Описание <sup>*</sup></label>
-        <textarea id="description" name="description" placeholder="Напишите описание лота"><?=getPostVal('description'); ?></textarea>
-          <?php if (isset($errors['description'])) : ?>
-			 <span class="form__error"><?= $errors['description'] ?></span>
-		  <?php endif; ?>
-      </div>
-      <div class="form__item form__item--file <?= empty($errors['lot-img']) ?: 'form__item--invalid' ?>"">
-        <label>Изображение <sup>*</sup></label>
-        <div class="form__input-file">
-          <input class="visually-hidden" type="file" id="lot-img" name="lot-img" value="">
-          <label for="lot-img">
-            Добавить
-          </label>
-        </div>
-		<?php if (isset($errors['lot-img'])) : ?> <!-- Вывод ошибок по картинкам -->
-			 <span class="form__error"><?= $errors['lot-img'] ?></span>
-		<?php endif; ?>
-      </div>
-      <div class="form__container-three">
-        <div class="form__item form__item--small <?= empty($errors['start_price']) ?: 'form__item--invalid' ?>">
-          <label for="start_price">Начальная цена <sup>*</sup></label>
-          <input id="start_price" type="text" name="start_price" value="<?=getPostVal('start_price'); ?>" placeholder="0">
-          <?php if (isset($errors['start_price'])) : ?>
-			 <span class="form__error"><?= $errors['start_price'] ?></span>
-		  <?php endif; ?>
-        </div>
-        <div class="form__item form__item--small <?= empty($errors['rate_step']) ?: 'form__item--invalid' ?>">
-          <label for="rate_step">Шаг ставки <sup>*</sup></label>
-          <input id="rate_step" type="text" name="rate_step" value="<?=getPostVal('rate_step'); ?>" placeholder="0">
-          <?php if (isset($errors['rate_step'])) : ?>
-			 <span class="form__error"><?= $errors['rate_step'] ?></span>
-		  <?php endif; ?>
-        </div>
-        <div class="form__item <?= empty($errors['dt_finish']) ?: 'form__item--invalid' ?>">
-          <label for="dt_finish">Дата окончания торгов <sup>*</sup></label>
-          <input class="form__input-date" id="dt_finish" type="text" name="dt_finish" value="<?=getPostVal('dt_finish'); ?>" placeholder="Введите дату в формате ГГГГ-ММ-ДД">
-          <?php if (isset($errors['dt_finish'])) : ?>
-			 <span class="form__error"><?= $errors['dt_finish'] ?></span>
-		  <?php endif; ?>
-        </div>
-      </div>
-		<?php if (!empty($errors)) : ?>
-			<span class="form__error form__error--bottom">Пожалуйста, исправьте ошибки в форме.</span>
-		<?php endif; ?>
-      <button type="submit" class="button">Добавить лот</button>
-    </form>
+    <section class="rates container">
+      <h2>Мои ставки</h2>
+      <table class="rates__list">
+        <tr class="rates__item">
+          <td class="rates__info">
+            <div class="rates__img">
+              <img src="../img/rate1.jpg" width="54" height="40" alt="Сноуборд">
+            </div>
+            <h3 class="rates__title"><a href="lot.html">2014 Rossignol District Snowboard</a></h3>
+          </td>
+          <td class="rates__category">
+            Доски и лыжи
+          </td>
+          <td class="rates__timer">
+            <div class="timer timer--finishing">07:13:34</div>
+          </td>
+          <td class="rates__price">
+            10 999 р
+          </td>
+          <td class="rates__time">
+            5 минут назад
+          </td>
+        </tr>
+        <tr class="rates__item">
+          <td class="rates__info">
+            <div class="rates__img">
+              <img src="../img/rate2.jpg" width="54" height="40" alt="Сноуборд">
+            </div>
+            <h3 class="rates__title"><a href="lot.html">DC Ply Mens 2016/2017 Snowboard</a></h3>
+          </td>
+          <td class="rates__category">
+            Доски и лыжи
+          </td>
+          <td class="rates__timer">
+            <div class="timer timer--finishing">07:13:34</div>
+          </td>
+          <td class="rates__price">
+            10 999 р
+          </td>
+          <td class="rates__time">
+            20 минут назад
+          </td>
+        </tr>
+        <tr class="rates__item rates__item--win">
+          <td class="rates__info">
+            <div class="rates__img">
+              <img src="../img/rate3.jpg" width="54" height="40" alt="Крепления">
+            </div>
+            <div>
+              <h3 class="rates__title"><a href="lot.html">Крепления Union Contact Pro 2015 года размер L/XL</a></h3>
+              <p>Телефон +7 900 667-84-48, Скайп: Vlas92. Звонить с 14 до 20</p>
+            </div>
+          </td>
+          <td class="rates__category">
+            Крепления
+          </td>
+          <td class="rates__timer">
+            <div class="timer timer--win">Ставка выиграла</div>
+          </td>
+          <td class="rates__price">
+            10 999 р
+          </td>
+          <td class="rates__time">
+            Час назад
+          </td>
+        </tr>
+        <tr class="rates__item">
+          <td class="rates__info">
+            <div class="rates__img">
+              <img src="../img/rate4.jpg" width="54" height="40" alt="Ботинки">
+            </div>
+            <h3 class="rates__title"><a href="lot.html">Ботинки для сноуборда DC Mutiny Charocal</a></h3>
+          </td>
+          <td class="rates__category">
+            Ботинки
+          </td>
+          <td class="rates__timer">
+            <div class="timer">07:13:34</div>
+          </td>
+          <td class="rates__price">
+            10 999 р
+          </td>
+          <td class="rates__time">
+            Вчера, в 21:30
+          </td>
+        </tr>
+        <tr class="rates__item rates__item--end">
+          <td class="rates__info">
+            <div class="rates__img">
+              <img src="../img/rate5.jpg" width="54" height="40" alt="Куртка">
+            </div>
+            <h3 class="rates__title"><a href="lot.html">Куртка для сноуборда DC Mutiny Charocal</a></h3>
+          </td>
+          <td class="rates__category">
+            Одежда
+          </td>
+          <td class="rates__timer">
+            <div class="timer timer--end">Торги окончены</div>
+          </td>
+          <td class="rates__price">
+            10 999 р
+          </td>
+          <td class="rates__time">
+            Вчера, в 21:30
+          </td>
+        </tr>
+        <tr class="rates__item rates__item--end">
+          <td class="rates__info">
+            <div class="rates__img">
+              <img src="../img/rate6.jpg" width="54" height="40" alt="Маска">
+            </div>
+            <h3 class="rates__title"><a href="lot.html">Маска Oakley Canopy</a></h3>
+          </td>
+          <td class="rates__category">
+            Разное
+          </td>
+          <td class="rates__timer">
+            <div class="timer timer--end">Торги окончены</div>
+          </td>
+          <td class="rates__price">
+            10 999 р
+          </td>
+          <td class="rates__time">
+            19.03.17 в 08:21
+          </td>
+        </tr>
+        <tr class="rates__item rates__item--end">
+          <td class="rates__info">
+            <div class="rates__img">
+              <img src="../img/rate7.jpg" width="54" height="40" alt="Сноуборд">
+            </div>
+            <h3 class="rates__title"><a href="lot.html">DC Ply Mens 2016/2017 Snowboard</a></h3>
+          </td>
+          <td class="rates__category">
+            Доски и лыжи
+          </td>
+          <td class="rates__timer">
+            <div class="timer timer--end">Торги окончены</div>
+          </td>
+          <td class="rates__price">
+            10 999 р
+          </td>
+          <td class="rates__time">
+            19.03.17 в 08:21
+          </td>
+        </tr>
+      </table>
+    </section>
   </main>
 
 </div>
 
 <footer class="main-footer">
   <nav class="nav">
-    <ul class="nav__list container">
+      <ul class="nav__list container">
 			<?php foreach ($categories as $item): ?>
 				<li class="nav__item">
 					<a href="pages/all-lots.html"><?=htmlspecialchars($item['name']); ?></a>
 				</li>
 			<?php endforeach; ?>
-    </ul>
+      </ul>
   </nav>
   <div class="main-footer__bottom container">
     <div class="main-footer__copyright">
@@ -152,7 +232,7 @@
         <svg width="27" height="27" viewBox="0 0 27 27" xmlns="http://www.w3.org/2000/svg"><circle stroke="#879296" fill="none" cx="13.5" cy="13.5" r="12.666"/><path fill="#879296" d="M13.92 18.07c.142-.016.278-.074.39-.166.077-.107.118-.237.116-.37 0 0 0-1.13.516-1.296.517-.165 1.208 1.09 1.95 1.58.276.213.624.314.973.28h1.95s.973-.057.525-.837c-.38-.62-.865-1.17-1.432-1.626-1.208-1.1-1.043-.916.41-2.816.886-1.16 1.236-1.86 1.13-2.163-.108-.302-.76-.214-.76-.214h-2.164c-.092-.026-.19-.026-.282 0-.083.058-.15.135-.195.225-.224.57-.49 1.125-.8 1.656-.973 1.61-1.344 1.697-1.51 1.59-.37-.234-.272-.975-.272-1.433 0-1.56.243-2.202-.468-2.377-.32-.075-.647-.108-.974-.098-.604-.052-1.213.01-1.793.186-.243.116-.438.38-.32.4.245.018.474.13.642.31.152.303.225.638.214.975 0 0 .127 1.832-.302 2.056-.43.223-.692-.167-1.55-1.618-.29-.506-.547-1.03-.77-1.57-.038-.09-.098-.17-.174-.233-.1-.065-.214-.108-.332-.128H6.485s-.312 0-.42.137c-.106.135 0 .36 0 .36.87 2 2.022 3.868 3.42 5.543.923.996 2.21 1.573 3.567 1.598z"/></svg>
       </a>
     </div>
-    <a class="main-footer__add-lot button" href="add.php">Добавить лот</a>
+    <a class="main-footer__add-lot button" href="/add.php">Добавить лот</a>
     <div class="main-footer__developed-by">
       <span class="visually-hidden">Разработано:</span>
       <a class="logo-academy" href="https://htmlacademy.ru/intensive/php">
@@ -167,7 +247,5 @@
   </div>
 </footer>
 
-<script src="../flatpickr.js"></script>
-<script src="../script.js"></script>
 </body>
 </html>
