@@ -324,19 +324,19 @@ function timeFromBet($rate_time) {
 	$correctTime = '';
 	if ($time_bet[0] > 0) {
 		$correctTime = $time_bet[0].' '.get_noun_plural_form($time_bet[0], 'день', 'дня', 'дней').' ';
-		$correctTime .= ' '.get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов').' ';
-		$correctTime .= ' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
+		$correctTime = $correctTime.$time_bet[1].' '.get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов').' ';
+		$correctTime = $correctTime.$time_bet[2].' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
 	} 
 	if ($time_bet[0] == 0){
 		if ($time_bet[1] > 0) {
 			$correctTime = $time_bet[1].' '.get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов').' ';
-			$correctTime .= ' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
+			$correctTime = $correctTime.$time_bet[2].' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
 		} else if ($time_bet[1] == 0) {
 			$correctTime = $time_bet[2].' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
 		}
 	}
 
-    return return $correctTime." назад";
+    return $correctTime." назад";
 }
 
 //Функция для получения информации о своих ставках
