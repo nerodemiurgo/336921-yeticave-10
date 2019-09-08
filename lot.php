@@ -7,7 +7,7 @@ $error404 = include_template('404.php');
 
 //Проверяем наличие запроса id для формирования страницы лота
 if (isset($_GET['id'])) {
-	$checkID = $_GET['id'];
+	$checkID = intval($_GET['id']);
 } else {
 	print ($error404);
 	die;
@@ -17,11 +17,11 @@ if (isset($_GET['id'])) {
 $categories = getCategories($link);
 
 //Объявляем массив с информацией для объявлений
-$lot_info = getLot($link, $_GET['id']);
+$lot_info = getLot($link, $checkID);
 
 //Вывод ошибки, если пришел пустой массив (id объявления не существует)
 $checkLotInfo = count($lot_info);
-if ($checkLotInfo == 0) {
+if ($checkLotInfo === 0) {
 	print ($error404);
 }
 	
@@ -50,9 +50,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$errors = array_filter($errors); 
 
 	//Добавление новой ставки
-	if (empty($errors)) {
-		$user_id = $_SESSION['user']['id'];
-		$lot_id = $_GET['id'];
+	if (empty($errors) && isset($_SESSION['user']['id'], $_GET['id'], $newrate['bid'])) {
+		$user_id = intval($_SESSION['user']['id']);
+		$lot_id = intval($_GET['id']);
 		$bid = $newrate['bid'];
 		mysqli_query($link, 'START TRANSACTION');
 		$newRate = mysqli_query($link, "INSERT INTO rate (bid, user_id, lot_id) VALUES ($bid, $user_id, $lot_id)");
@@ -65,17 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			}
 			
 			header ('Location: /lot.php?id='.$lot_id);
+			exit;
 	} 
 }
-
-	$rates = getHistoryRates($link, $_GET['id']);
-	
-//Условие отображения формы добавления ставки	
-	if (!empty($_SESSION)) {
-	$CanSeeBets = isUserCanSeeBets($link, $lot_info['dt_finish'], $_SESSION['user'], $lot_info['author_id'], $_GET['id']);
-	} else {
-		$CanSeeBets = false;
-	}
+	$lot_id = intval($_GET['id']);
+	$rates = isset($lot_id) ? getHistoryRates($link, $lot_id) : [];
+	$canseebets = isUserCanMakeBet($link, $lot_info);
 	
 //Формирование массива и подключение шаблона лота
 $lot_page = include_template('lotpage.php', [
@@ -83,6 +78,6 @@ $lot_page = include_template('lotpage.php', [
 	'lot_info' => $lot_info,
 	'errors' => $errors,
 	'rates' => $rates,
-	'canseebets' => $CanSeeBets
+	'canseebets' => $canseebets
 ]);
 print ($lot_page);

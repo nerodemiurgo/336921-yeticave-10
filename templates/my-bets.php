@@ -22,7 +22,7 @@
       </form>
       <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
 			<nav class="user-menu">
-				<?php if (!empty($_SESSION['user'])) : ?>
+				<?php if (!empty($_SESSION['user']['user_name'])) : ?>
 					<div class="user-menu__logged">
 						<p><?=$_SESSION['user']['user_name'];?></p>
 						<a class="user-menu__bets" href="/bets.php">Мои ставки</a>
@@ -38,7 +38,9 @@
       <ul class="nav__list container">
 			<?php foreach ($categories as $item): ?>
 				<li class="nav__item">
-					<a href="pages/all-lots.html"><?=htmlspecialchars($item['name']); ?></a>
+					<?php if (isset($item['name'])) : ?>
+						<a href="/lot.php?id=<?=htmlspecialchars($item['lot_id']); ?>"><?=htmlspecialchars($item['name']); ?></a>
+					<?php endif; ?>
 				</li>
 			<?php endforeach; ?>
       </ul>

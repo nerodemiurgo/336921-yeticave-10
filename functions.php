@@ -261,29 +261,39 @@ function getHistoryRates ($sql_link, $lot_id) {
 }
 
 //Функция проверки доступа к форме создания ставки
-function isUserCanSeeBets($sql_link, $end_date, $session, $author_id, $lot_id) {
-		$session = $_SESSION['user'] ?? 0;
-		$lot_id = $_GET['id'] ?? 0;
-	
-		$cur_ts = time();
-		$end_ts = strtotime($end_date);
-		$ts_diff = $end_ts - $cur_ts;
-		$correctTimer = $ts_diff > 0;
-		
-		$correctLotAuthor = $author_id !== $session['id'];
-		
-		$sql = 'SELECT r.created_at AS time, r.user_id AS user_id, r.lot_id FROM rate r
+function isUserCanMakeBet($sql_link, $lot): bool
+{
+    if (!isset($_SESSION['user']['id'], $_GET['id'], $lot['dt_finish'], $lot['author_id'])) {
+        return false;
+    }
+
+    $user_id = $_SESSION['user']['id'];
+    $lot_id = mysqli_real_escape_string($sql_link, $_GET['id']);
+
+    if ($lot['author_id'] === $user_id) {
+        return false;
+    }
+
+    $cur_ts = time();
+    $end_ts = strtotime($lot['dt_finish']);
+    $ts_diff = $end_ts - $cur_ts;
+
+    if ($ts_diff <= 0) {
+        return false;
+    }
+
+    $sql = 'SELECT r.created_at AS time, r.user_id AS user_id, r.lot_id FROM rate r
 		WHERE r.lot_id = '.$lot_id.'
 		ORDER BY time DESC LIMIT 1
 		;';
-		$result = mysqli_query($sql_link, $sql);
-		$last_rate = mysqli_fetch_assoc($result);
-		
-		$correctRateAuthor = $last_rate['user_id'] !== $session['id'];
-		
-		if ($correctTimer && $correctLotAuthor && $correctRateAuthor) {
-			return true;
-		}
+    $result = mysqli_query($sql_link, $sql);
+    $last_rate = mysqli_fetch_assoc($result);
+
+    if (!isset($last_rate['user_id'])) {
+        return false;
+    }
+
+    return $last_rate['user_id'] !== $user_id;
 }
 
 //Функция возврата класса в строку
@@ -335,17 +345,29 @@ function timeFromBet($rate_time) {
 
 //Функция для получения информации о своих ставках
 function getMyLots ($sql_link, $user_id) {
-	$user_id = $_SESSION['user']['id'] ?? 0;
-	$sql = 'SELECT r.id, r.created_at AS time, r.user_id, r.lot_id,
-	l.id AS lot_id, l.name AS lot_name, l.img AS img,  l.price AS price, l.dt_finish AS dt_finish, l.category_id, l.winner_id AS winner_id, l.author_id,
-	c.name AS category_name, u.id, u.contact AS contact
+	$user_id = intval($user_id);
+	$sql = 'SELECT MAX(r.id),
+       MAX(r.created_at) AS time,
+       r.user_id,
+       r.lot_id,
+       l.id              AS lot_id,
+       l.name            AS lot_name,
+       l.img             AS img,
+       MAX(r.bid)        AS price,
+       l.dt_finish       AS dt_finish,
+       l.category_id,
+       l.winner_id       AS winner_id,
+       l.author_id,
+       c.name            AS category_name,
+       u.id,
+       u.contact         AS contact
 	FROM rate r
-		JOIN lot l ON r.lot_id = l.id
-		JOIN category c ON l.category_id = c.id
-		JOIN user u ON l.author_id = u.id
-		
-		WHERE r.user_id = '.$user_id.'
-		ORDER BY r.created_at DESC;';
+			 JOIN lot l ON r.lot_id = l.id
+			 JOIN category c ON l.category_id = c.id
+			 JOIN user u ON l.author_id = u.id
+	WHERE r.user_id = '.$user_id.'
+	GROUP BY l.id
+	ORDER BY time DESC';
 		
 	$result = mysqli_query($sql_link, $sql);
 	
