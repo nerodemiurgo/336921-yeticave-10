@@ -290,7 +290,7 @@ function isUserCanMakeBet($sql_link, $lot): bool
     $last_rate = mysqli_fetch_assoc($result);
 
     if (!isset($last_rate['user_id'])) {
-        return false;
+        return true;
     }
 
     return $last_rate['user_id'] !== $user_id;
@@ -301,46 +301,42 @@ function classToString($dt_finish, $winner_id) {
 	if (isset($winner_id)) {
 		return "rates__item--win";
 	} 
-	if (!isset($winner_id)) {
-		$date_now = date_create('now');
-		$date_finish = date_create($dt_finish);
-		if ($date_finish > $date_now) {
-			return null;
-		}
-		if ($date_finish <= $date_now) {
-			return 'rates__item--end';
-		}
+	
+	$date_now = date_create('now');
+	$date_finish = date_create($dt_finish);
+	if ($date_finish > $date_now) {
+		return null;
+	}
+	if ($date_finish <= $date_now) {
+		return 'rates__item--end';
 	}
 }
 
 //Функция красивого вывода времени, прошедшего от ставки
 function timeFromBet($rate_time) {
-		$time = '';
+		$time_bet = '';
 		$date_now = date_create('now');
 		$date_rate = date_create($rate_time);
 		$date_diff = date_diff($date_rate, $date_now);
 		$hour = date_interval_format($date_diff, '%d %h %i');
-		$time = explode(' ', $hour);
-		$days_left = $time[0];
-	
+		$time_bet = explode(' ', $hour);	
 
 	$correctTime = '';
-	if ($time[0] > 0) {
-		$correctTime = $time[0].' '.get_noun_plural_form($time[0], 'день', 'дня', 'дней').' ';
-		$correctTime = $correctTime.$time[1].' '.get_noun_plural_form($time[1], 'час', 'часа', 'часов').' ';
-		$correctTime = $correctTime.$time[2].' '.get_noun_plural_form($time[2], 'минута', 'минуты', 'минут');
+	if ($time_bet[0] > 0) {
+		$correctTime = $time_bet[0].' '.get_noun_plural_form($time_bet[0], 'день', 'дня', 'дней').' ';
+		$correctTime .= ' '.get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов').' ';
+		$correctTime .= ' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
 	} 
-	if ($time[0] == 0){
-		if ($time[1] > 0) {
-			$correctTime = $time[1].' '.get_noun_plural_form($time[1], 'час', 'часа', 'часов').' ';
-			$correctTime = $correctTime.$time[2].' '.get_noun_plural_form($time[2], 'минута', 'минуты', 'минут');
-		} else if ($time[1] == 0) {
-			$correctTime = $time[2].' '.get_noun_plural_form($time[2], 'минута', 'минуты', 'минут');
+	if ($time_bet[0] == 0){
+		if ($time_bet[1] > 0) {
+			$correctTime = $time_bet[1].' '.get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов').' ';
+			$correctTime .= ' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
+		} else if ($time_bet[1] == 0) {
+			$correctTime = $time_bet[2].' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
 		}
 	}
 
-	$correctTime = $correctTime." назад";
-    return $correctTime;
+    return return $correctTime." назад";
 }
 
 //Функция для получения информации о своих ставках
