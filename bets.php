@@ -7,11 +7,21 @@ if (empty($_SESSION['user'])) {
 	exit;
 }
 
+if (!empty($_SESSION['user'])) { 
+
 //Объявляем массив с категориями
 $categories = getCategories($link);
 
+$user_id = $_SESSION['user']['id'];
+
+//Получаем информацию по лотам
+$lot_info = getMyLots($link, $user_id);
+
 $bets_page = include_template('my-bets.php', [
-'categories' => $categories
+	'categories' => $categories,
+	'lot_info' => $lot_info
 	]);
 	
+	
 print ($bets_page);	
+}

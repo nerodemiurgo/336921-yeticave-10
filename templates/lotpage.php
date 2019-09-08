@@ -63,7 +63,7 @@
           <p class="lot-item__description"><?=htmlspecialchars($lot_info['lot_desc']); ?></p>
         </div>
         <div class="lot-item__right">
-		  <?php if (!empty($_SESSION)) : ?>
+		  <?php if ($canseebets == true): ?>
           <div class="lot-item__state">
 			<?php $timeend = timeuptoend($lot_info['dt_finish']);?>
 					<div class="lot-item__timer timer <?= $timeend[0] < 1 ? 'timer--finishing' : '' ?>">
@@ -90,18 +90,20 @@
             </form>
           </div>
 		  <?php endif; ?>
+		  <?php if (!empty($rates)) : ?>
           <div class="history">
             <h3>История ставок (<span>10</span>)</h3>
             <table class="history__list">
 			<?php foreach ($rates as $item): ?>
               <tr class="history__item">
                 <td class="history__name"><?=htmlspecialchars($item['user_name']); ?></td>
-                <td class="history__price"><?=htmlspecialchars($item['bid']); ?></td>
-                <td class="history__time"><?=htmlspecialchars($item['time']); ?></td>
+                <td class="history__price"><?=decorate_price(htmlspecialchars($item['bid'])); ?></td>
+                <td class="history__time"><?=timeFromBet(htmlspecialchars($item['time'])); ?></td>
               </tr>
 			<?php endforeach; ?>
             </table>
           </div>
+		  <?php endif; ?>
         </div>
       </div>
     </section>

@@ -69,13 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 	$rates = getHistoryRates($link, $_GET['id']);
-	var_dump ($rates);
+	
+//Условие отображения формы добавления ставки	
+	if (!empty($_SESSION)) {
+	$CanSeeBets = isUserCanSeeBets($link, $lot_info['dt_finish'], $_SESSION['user'], $lot_info['author_id'], $_GET['id']);
+	} else {
+		$CanSeeBets = false;
+	}
 	
 //Формирование массива и подключение шаблона лота
 $lot_page = include_template('lotpage.php', [
 	'categories' => $categories,
 	'lot_info' => $lot_info,
 	'errors' => $errors,
-	'rates' => $rates
+	'rates' => $rates,
+	'canseebets' => $CanSeeBets
 ]);
 print ($lot_page);

@@ -61,9 +61,7 @@ function getLots ($sql_link) {
 function getLot ($sql_link, $link_id) {
 	if ($link_id == '') {$link_id = 0;}
 	
-	$sql = 'SELECT l.name AS lot_name, c.name AS category_name, start_price, price, rate_step, img, description AS lot_desc, dt_finish, l.id AS lot_id FROM lot l
-			JOIN category c
-			ON l.category_id = c.id  WHERE l.id = '.$link_id.'';
+	$sql = 'SELECT l.id AS lot_id, l.name AS lot_name, l.description AS lot_desc, l.img AS img, l.start_price AS start_price, l.price AS price, l.dt_finish AS dt_finish, l.rate_step AS rate_step, l.category_id, l.author_id AS author_id, c.name AS category_name FROM lot l JOIN category c ON l.category_id = c.id WHERE l.id = '.$link_id.'';
 	
 	$result = mysqli_query($sql_link, $sql);
 		if ($result === false) {
@@ -246,13 +244,109 @@ function validateEmail($email) {
 //Функция для получения истории ставок
 function getHistoryRates ($sql_link, $lot_id) {
 	$lot_id = $_GET['id'] ?? 0;
-	$sql = 'SELECT r.created_at AS time, r.bid AS bid, r.user_id AS user_id, r.lot_id FROM rate r
+	$sql = 'SELECT r.created_at AS time, r.bid AS bid, r.user_id AS user_id, r.lot_id, u.user_name FROM rate r
 			JOIN user u
 			ON r.user_id = u.id
 			WHERE r.lot_id = '.$lot_id.'
 			ORDER BY time DESC LIMIT 10
 			
 			;';
+	$result = mysqli_query($sql_link, $sql);
+	
+		if ($result === false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
+		}
+	
+	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+//Функция проверки доступа к форме создания ставки
+function isUserCanSeeBets($sql_link, $end_date, $session, $author_id, $lot_id) {
+		$session = $_SESSION['user'] ?? 0;
+		$lot_id = $_GET['id'] ?? 0;
+	
+		$cur_ts = time();
+		$end_ts = strtotime($end_date);
+		$ts_diff = $end_ts - $cur_ts;
+		$correctTimer = $ts_diff > 0;
+		
+		$correctLotAuthor = $author_id !== $session['id'];
+		
+		$sql = 'SELECT r.created_at AS time, r.user_id AS user_id, r.lot_id FROM rate r
+		WHERE r.lot_id = '.$lot_id.'
+		ORDER BY time DESC LIMIT 1
+		;';
+		$result = mysqli_query($sql_link, $sql);
+		$last_rate = mysqli_fetch_assoc($result);
+		
+		$correctRateAuthor = $last_rate['user_id'] !== $session['id'];
+		
+		if ($correctTimer && $correctLotAuthor && $correctRateAuthor) {
+			return true;
+		}
+}
+
+//Функция возврата класса в строку
+function classToString($dt_finish, $winner_id) {
+	if (isset($winner_id)) {
+		return "rates__item--win";
+	} 
+	if (!isset($winner_id)) {
+		$date_now = date_create('now');
+		$date_finish = date_create($dt_finish);
+		if ($date_finish > $date_now) {
+			return null;
+		}
+		if ($date_finish <= $date_now) {
+			return 'rates__item--end';
+		}
+	}
+}
+
+//Функция красивого вывода времени, прошедшего от ставки
+function timeFromBet($rate_time) {
+		$time = '';
+		$date_now = date_create('now');
+		$date_rate = date_create($rate_time);
+		$date_diff = date_diff($date_rate, $date_now);
+		$hour = date_interval_format($date_diff, '%d %h %i');
+		$time = explode(' ', $hour);
+		$days_left = $time[0];
+	
+
+	$correctTime = '';
+	if ($time[0] > 0) {
+		$correctTime = $time[0].' '.get_noun_plural_form($time[0], 'день', 'дня', 'дней').' ';
+		$correctTime = $correctTime.$time[1].' '.get_noun_plural_form($time[1], 'час', 'часа', 'часов').' ';
+		$correctTime = $correctTime.$time[2].' '.get_noun_plural_form($time[2], 'минута', 'минуты', 'минут');
+	} 
+	if ($time[0] == 0){
+		if ($time[1] > 0) {
+			$correctTime = $time[1].' '.get_noun_plural_form($time[1], 'час', 'часа', 'часов').' ';
+			$correctTime = $correctTime.$time[2].' '.get_noun_plural_form($time[2], 'минута', 'минуты', 'минут');
+		} else if ($time[1] == 0) {
+			$correctTime = $time[2].' '.get_noun_plural_form($time[2], 'минута', 'минуты', 'минут');
+		}
+	}
+
+	$correctTime = $correctTime." назад";
+    return $correctTime;
+}
+
+//Функция для получения информации о своих ставках
+function getMyLots ($sql_link, $user_id) {
+	$user_id = $_SESSION['user']['id'] ?? 0;
+	$sql = 'SELECT r.id, r.created_at AS time, r.user_id, r.lot_id,
+	l.id AS lot_id, l.name AS lot_name, l.img AS img,  l.price AS price, l.dt_finish AS dt_finish, l.category_id, l.winner_id AS winner_id, l.author_id,
+	c.name AS category_name, u.id, u.contact AS contact
+	FROM rate r
+		JOIN lot l ON r.lot_id = l.id
+		JOIN category c ON l.category_id = c.id
+		JOIN user u ON l.author_id = u.id
+		
+		WHERE r.user_id = '.$user_id.'
+		ORDER BY r.created_at DESC;';
+		
 	$result = mysqli_query($sql_link, $sql);
 	
 		if ($result === false) {
