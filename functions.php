@@ -71,6 +71,40 @@ function getLot ($sql_link, $link_id) {
 	return mysqli_fetch_assoc($result);
 }
 
+function searchLots ($sql_link) {
+	$search = trim($_GET['search']) ?? '';
+	if (!empty($search)) {
+	$sql = 'SELECT
+		l.name AS lot_name,
+		c.name AS category_name,
+		l.description,
+		start_price,
+		price,
+		img,
+		dt_finish,
+		l.id AS lot_id
+		
+			FROM lot l
+			JOIN category c ON l.category_id = c.id 
+			WHERE MATCH(l.name, l.description) AGAINST(?) AND dt_finish > NOW()
+			ORDER BY created_at DESC
+			';
+	$stmt = db_get_prepare_stmt($sql_link, $sql, [$search]);
+	mysqli_stmt_execute($stmt);
+	$result = mysqli_stmt_get_result($stmt);
+	
+		if ($result === false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
+		} else {
+			if ($result === null) {
+				return null;
+			} else {
+			return mysqli_fetch_all($result, MYSQLI_ASSOC);
+			}
+		}
+	}
+}
+
 //Функция для отправки массива в БД
 function db_insert_data($link, $sql, $data = [])
 {
@@ -372,4 +406,18 @@ function getMyLots ($sql_link, $user_id) {
 		}
 	
 	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+function send_message($user_name, $content, $email) 
+{
+    $transport = new Swift_SmtpTransport('phpdemo.ru', 25);
+    $transport->setPassword('htmlacademy');
+    $transport->setUsername('keks@phpdemo.ru');
+	
+    $message = new Swift_Message('Ваша ставка победила');
+    $message->setTo([$email, $email => $user_name]);
+    $message->setFrom(['keks@phpdemo.ru' => 'YetiCave']);
+    $message->setBody($content, 'text/html');
+    $mailer = new Swift_Mailer($transport);
+    $result = $mailer->send($message);
 }

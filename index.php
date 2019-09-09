@@ -3,6 +3,7 @@ $title = 'YetiCave - заголовок страницы';
 
 //Подключаем функции
 require_once('init.php');
+require_once('getwinner.php');
 
 //Проверка ошибки при подключении БД
 if ($link === false) {
