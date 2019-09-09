@@ -42,3 +42,6 @@ CREATE TABLE rate (
 	user_id INT NOT NULL,
 	lot_id INT NOT NULL
 );
+
+/* Добавление индексов для фуллтекст поиска */
+CREATE FULLTEXT INDEX lot_ft_search ON lot (name, description);

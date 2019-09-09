@@ -2,8 +2,13 @@
 //Подключаем функции
 require_once('init.php');
 
+//Объявляем массив с категориями
+$categories = getCategories($link);
+
 //Подключаем шаблон ошибки 404
-$error404 = include_template('404.php');
+$error404 = include_template('404.php',[
+	'categories' => $categories
+]);
 
 //Проверяем наличие запроса id для формирования страницы лота
 if (isset($_GET['id'])) {
@@ -13,9 +18,6 @@ if (isset($_GET['id'])) {
 	die;
 }
 
-//Объявляем массив с категориями
-$categories = getCategories($link);
-
 //Объявляем массив с информацией для объявлений
 $lot_info = getLot($link, $checkID);
 
@@ -23,6 +25,7 @@ $lot_info = getLot($link, $checkID);
 $checkLotInfo = count($lot_info);
 if ($checkLotInfo === 0) {
 	print ($error404);
+	die;
 }
 	
 //Объявляем массив ошибок и обязательных полей
