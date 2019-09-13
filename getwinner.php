@@ -62,8 +62,3 @@ require_once('vendor/autoload.php');
                 send_message($user_name, $email, $mail); 
 			};
 		};
-
-	
-	
-	
-	

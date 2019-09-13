@@ -25,7 +25,6 @@ CREATE TABLE user (
 	user_name CHAR(128) NOT NULL,
 	email CHAR(128) NOT NULL UNIQUE,
 	password CHAR(128) NOT NULL,
-	avatar CHAR(128),
 	contact CHAR(255) NOT NULL
 );
 

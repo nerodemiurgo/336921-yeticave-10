@@ -4,9 +4,6 @@ require_once('init.php');
 
 //Объявляем массив с категориями
 	$categories = getCategories($link);
-
-/* //Объявляем массив с юзерами
-	$users = getUsers($link); */
 	
 //Объявляем массив ошибок и обязательных полей
 	$required = ['email', 'password'];
@@ -16,7 +13,10 @@ require_once('init.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	
 	//Копируем все данные из массива POST
-	$userenter = $_POST;
+	$userenter = [
+  'email' => mysqli_real_escape_string($link, $_POST['email']) ?? null,
+  'password' => mysqli_real_escape_string($link, $_POST['password']) ?? null
+];
 	
 	//Объявляем массив проверок
 	$rules = [
@@ -65,10 +65,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 }
 
-	//Включаем шаблон
-$login_page = include_template('login.php', [
+//Формируем контент страницы
+$page_content = include_template('login.php', [
 	'categories' => $categories,
 	'errors' => $errors
 ]);
 
-print ($login_page);
+//Задаем тайтл
+$title = 'Вход';
+
+//Включаем шаблон layout
+$layout_content = include_template('backpage.php', [
+	'title' => $title,
+	'categories' => $categories,
+	'content' => $page_content
+]);
+
+print($layout_content);

@@ -18,7 +18,14 @@ if (empty($_SESSION['user'])) {
 //Проверка, что форма была отправлена
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	//Копируем все данные из массива POST
-	$newlot = $_POST;
+$newlot = [
+  'name' => mysqli_real_escape_string($link, $_POST['name']) ?? null,
+  'category' => mysqli_real_escape_string($link, $_POST['category']) ?? null,
+  'description' => mysqli_real_escape_string($link, $_POST['description']) ?? null, 
+  'start_price' => mysqli_real_escape_string($link, $_POST['start_price']) ?? null,
+  'rate_step' => mysqli_real_escape_string($link, $_POST['rate_step']) ?? null,
+  'dt_finish' => mysqli_real_escape_string($link, $_POST['dt_finish']) ?? null
+];
 	
 	//Объявляем массив проверок
 	$rules = [
@@ -51,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	
 	//Переменные цены, автора
 	$newlot['price'] = $newlot['start_price'];
-	$newlot['author_id'] = $_SESSION['user']['id'];	
+	$newlot['author_id'] = mysqli_real_escape_string($link, $_SESSION['user']['id']);	
 
 	if (empty($errors)) {
 	//Валидация изображения
@@ -91,9 +98,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	} 
 }
 
-	$add_page = include_template('add-lot.php', [
+//Формируем контент страницы
+$page_content = include_template('add-lot.php', [
 	'categories' => $categories,
 	'errors' => $errors
-	]);
-	
-print ($add_page);
+]);
+
+//Задаем тайтл
+$title = 'Добавление лота';
+
+//Включаем шаблон layout
+$layout_content = include_template('backpage.php', [
+	'title' => $title,
+	'categories' => $categories,
+	'content' => $page_content
+]);
+
+print($layout_content);

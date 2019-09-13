@@ -1,10 +1,10 @@
     <div class="container">
       <section class="lots">
-        <h2>Результаты поиска по запросу «<span><?=htmlspecialchars($search); ?></span>»</h2>
+        <h2>Все лоты в категории «<span><?=htmlspecialchars($mycat['name']); ?></span>»</h2>
         <ul class="lots__list">
 		
 			<?php if (empty($lots)): ?>
-				<p>По вашему запросу ничего не найдено.</p>
+				<p>В этой категории нет лотов.</p>
 			<?php endif; ?>
 			
 			<?php if (!empty($search)): ?>
@@ -39,5 +39,16 @@
         </ul>
       </section>
 	  	  
-	<?=$pagination; ?>
+      <ul class="pagination-list">
+			<?php if ($pages_count > 1): ?> 
+				<li class="pagination-item pagination-item-prev"><a href="/all-lots.php?cat=<?=htmlspecialchars($search);?>&page=<?=($cur_page-1);?>">Назад</a></li>				
+					<?php foreach ($pages as $page): ?>
+						<li class="pagination-item <?php if ($page == $cur_page): ?>pagination-item-active<?php endif; ?>">
+							<a href="/all-lots.php?cat=<?=htmlspecialchars($search);?>&page=<?=$page;?>"><?=$page;?></a>
+						</li>	
+					<?php endforeach; ?>
+				<li class="pagination-item pagination-item-next"><a href="/all-lots.php?cat=<?=htmlspecialchars($search);?>&page=<?=($cur_page+1);?>">Вперед</a></li>	
+			<?php endif; ?>
+      </ul>
+	  
     </div>

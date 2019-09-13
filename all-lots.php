@@ -10,20 +10,25 @@ $categories = getCategories($link);
 	'categories' => $categories
 ]);
 
-if (!isset($_GET['search']) || $_GET['search'] === '') {
+if (!isset($_GET['cat']) || $_GET['cat'] === '') {
 	print ($error404);
     exit;
 }
 
 //Получаем содержимое поискового запроса
-$search = mysqli_real_escape_string($link, trim($_GET['search']));
+$search = mysqli_real_escape_string($link, trim($_GET['cat']));
 $searchLots = '';
 
+//Получаем информацию о категории
+		$sqlcat = 'SELECT id, name, code FROM category WHERE code = "'.$search.'";';
+		$resultcat = mysqli_query($link, $sqlcat);
+		$mycat = mysqli_fetch_assoc($resultcat) ?? null;
+
+//Считаем лоты в категории	
 $sql = 'SELECT
 		COUNT(l.id) as count
 			FROM lot l
-			JOIN category c ON l.category_id = c.id 
-			WHERE MATCH(l.name, l.description) AGAINST(\''.$search.'\') AND dt_finish > NOW()';
+			WHERE category_id = "'.$mycat['id'].'" AND dt_finish > NOW()';
 
 
 $result      = mysqli_query($link, $sql);
@@ -52,11 +57,15 @@ $sql = 'SELECT
 		
 			FROM lot l
 			JOIN category c ON l.category_id = c.id 
-			WHERE MATCH(l.name, l.description) AGAINST(\''.$search.'\') AND dt_finish > NOW()
+			WHERE category_id = "'.$mycat['id'].'" AND dt_finish > NOW()
 			ORDER BY created_at DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
 
 $result = mysqli_query($link, $sql);
+if ($result) {
 $lots   = mysqli_fetch_all($result, MYSQLI_ASSOC);
+} else {
+	die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($link));
+} 
 
 //Добавление количества ставок
 for($n=0; $n<=8; $n=$n+1) {
@@ -83,32 +92,26 @@ for($n=0; $n<=8; $n=$n+1) {
 	}
 	
 //Формируем контент страницы
-$pagination = include_template(
-	'pagination.php',
-	[
-		'search'      => $search,
-        'pages'       => $pages,
-        'pages_count' => $pages_count,
-        'cur_page'    => $cur_page
-	]);
-
 $page_content = include_template(
-    'search_page.php',
+    'all-lots.php',
     [
         'categories'  => $categories,
         'search'      => $search,
         'lots'        => $lots,
-		'pagination' => $pagination
+        'pages'       => $pages,
+        'pages_count' => $pages_count,
+        'cur_page'    => $cur_page,
+		'mycat'		  => $mycat
     ]);
 
 //Задаем тайтл
-$title = 'Поиск '.$search ;
+$title = 'Лоты категории '.$mycat['name'] ?? null;
 
 //Включаем шаблон layout
 $layout_content = include_template('backpage.php', [
-	'title' => $title,
+	'title'      => $title,
 	'categories' => $categories,
-	'content' => $page_content
+	'content'    => $page_content
 ]);
 
 print($layout_content);

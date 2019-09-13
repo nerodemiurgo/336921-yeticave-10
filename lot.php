@@ -36,7 +36,9 @@ if ($checkLotInfo === 0) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 	//Копируем все данные из массива POST
-	$newrate = $_POST;
+	$newrate = [
+		'bid' => $_POST['bid'] ?? null,
+	];
 	
 	//Проверка поля на заполненность
 	foreach ($required as $key) {
@@ -75,12 +77,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$rates = isset($lot_id) ? getHistoryRates($link, $lot_id) : [];
 	$canseebets = isUserCanMakeBet($link, $lot_info);
 	
-//Формирование массива и подключение шаблона лота
-$lot_page = include_template('lotpage.php', [
+
+//Формируем контент страницы
+$page_content = include_template('lotpage.php', [
 	'categories' => $categories,
 	'lot_info' => $lot_info,
 	'errors' => $errors,
 	'rates' => $rates,
 	'canseebets' => $canseebets
 ]);
-print ($lot_page);
+
+//Задаем тайтл
+$title = $lot_info['lot_name'];
+
+//Включаем шаблон layout
+$layout_content = include_template('backpage.php', [
+	'title' => $title,
+	'categories' => $categories,
+	'content' => $page_content
+]);
+
+print($layout_content);

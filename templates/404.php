@@ -22,9 +22,9 @@
             </form>
             <a class="main-header__add-lot button" href="/add.php">Добавить лот</a>
 			<nav class="user-menu">
-				<?php if (!empty($_SESSION['user'])) : ?>
+				<?php if (!empty($_SESSION['user'] ?? null)) : ?>
 					<div class="user-menu__logged">
-						<p><?=$_SESSION['user']['user_name'];?></p>
+						<p><?=htmlspecialchars($_SESSION['user']['user_name'] ?? null);?></p>
 						<a class="user-menu__bets" href="/bets.php">Мои ставки</a>
 						<a class="user-menu__logout" href="/logout.php">Выход</a>
 					</div>
@@ -47,7 +47,7 @@
         <ul class="nav__list container">
 			<?php foreach ($categories as $item): ?>
 				<li class="nav__item">
-					<a href="pages/all-lots.html"><?=htmlspecialchars($item['name']); ?></a>
+					<a href="/all-lots.php?cat=<?=htmlspecialchars($item['code']); ?>"><?=htmlspecialchars($item['name']); ?></a>
 				</li>
 			<?php endforeach; ?>
         </ul>
@@ -65,7 +65,7 @@
         <ul class="nav__list container">
 			<?php foreach ($categories as $item): ?>
 				<li class="nav__item">
-					<a href="pages/all-lots.html"><?=htmlspecialchars($item['name']); ?></a>
+					<a href="/all-lots.php?cat=<?=htmlspecialchars($item['code']); ?>"><?=htmlspecialchars($item['name']); ?></a>
 				</li>
 			<?php endforeach; ?>
         </ul>

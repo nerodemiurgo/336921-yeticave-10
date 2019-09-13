@@ -33,7 +33,7 @@ function getCategories ($sql_link) {
 
 //Функция для получения списка юзеров
 function getUsers ($sql_link) {
-	$sql = 'SELECT id, user_name, email, password, avatar, contact FROM user;';
+	$sql = 'SELECT id, user_name, email, password, contact FROM user;';
 	$result = mysqli_query($sql_link, $sql);
 	
 		if ($result === false) {
@@ -69,40 +69,6 @@ function getLot ($sql_link, $link_id) {
 		}
 	
 	return mysqli_fetch_assoc($result);
-}
-
-function searchLots ($sql_link) {
-	$search = trim($_GET['search']) ?? '';
-	if (!empty($search)) {
-	$sql = 'SELECT
-		l.name AS lot_name,
-		c.name AS category_name,
-		l.description,
-		start_price,
-		price,
-		img,
-		dt_finish,
-		l.id AS lot_id
-		
-			FROM lot l
-			JOIN category c ON l.category_id = c.id 
-			WHERE MATCH(l.name, l.description) AGAINST(?) AND dt_finish > NOW()
-			ORDER BY created_at DESC
-			';
-	$stmt = db_get_prepare_stmt($sql_link, $sql, [$search]);
-	mysqli_stmt_execute($stmt);
-	$result = mysqli_stmt_get_result($stmt);
-	
-		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		} else {
-			if ($result === null) {
-				return null;
-			} else {
-			return mysqli_fetch_all($result, MYSQLI_ASSOC);
-			}
-		}
-	}
 }
 
 //Функция для отправки массива в БД
@@ -188,7 +154,7 @@ function getPostVal($name) {
 
 //Проверка начальной цены
 function validateStartPrice($start_price) {
-	$start_price = $_POST[$start_price] ?? 0;
+	$start_price = intval($_POST[$start_price]) ?? 0;
 	if ($start_price <= 0) {
 		return "Стартовая цена должна быть больше нуля";
 	}
@@ -197,7 +163,7 @@ function validateStartPrice($start_price) {
 
 //Проверка даты завершения
 function validateDtFinish($dt_finish) {
-	$dt_finish = $_POST[$dt_finish] ?? 0;
+	$dt_finish = $_POST[$dt_finish] ?? 0; /* Как здесь сделать защиту от инъекций? */
 	$date = is_date_valid($dt_finish);
 	$now = time();
 	if ($date == true) {
@@ -216,7 +182,7 @@ function validateDtFinish($dt_finish) {
 	
 	//Проверка шага ставки
 function validateRateStep($rate_step) {
-	$rate_step = $_POST[$rate_step] ?? 0;
+	$rate_step = intval($_POST[$rate_step]) ?? 0;
 	if ($rate_step < 0 ) {
 		return "Шаг ставки не может быть отрицательным числом";
 	} else {	
@@ -238,7 +204,7 @@ function validateRateStep($rate_step) {
 
 	//Проверка ставки
 function validateRate($new_rate, $price, $rate_step) {
-	$new_rate = $_POST['bid'] ?? 0;
+	$new_rate = intval($_POST['bid']) ?? 0;
 	if ($new_rate < 0 ) {
 		return "Ставка не может быть отрицательным числом";
 	} else {	
@@ -266,7 +232,7 @@ function validateRate($new_rate, $price, $rate_step) {
 
 //Проверка корректности email
 function validateEmail($email) {
-	$email = $_POST[$email] ?? 0;
+	$email = $_POST[$email] ?? 0;  /* Как здесь сделать защиту от инъекций? */
 	if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 		return null;
 	} 
@@ -277,7 +243,7 @@ function validateEmail($email) {
 
 //Функция для получения истории ставок
 function getHistoryRates ($sql_link, $lot_id) {
-	$lot_id = $_GET['id'] ?? 0;
+	$lot_id = intval($_GET['id']) ?? 0;
 	$sql = 'SELECT r.created_at AS time, r.bid AS bid, r.user_id AS user_id, r.lot_id, u.user_name FROM rate r
 			JOIN user u
 			ON r.user_id = u.id
@@ -302,7 +268,7 @@ function isUserCanMakeBet($sql_link, $lot): bool
     }
 
     $user_id = $_SESSION['user']['id'];
-    $lot_id = mysqli_real_escape_string($sql_link, $_GET['id']);
+    $lot_id = mysqli_real_escape_string($sql_link, intval($_GET['id']));
 
     if ($lot['author_id'] === $user_id) {
         return false;
@@ -420,4 +386,25 @@ function send_message($user_name, $content, $email)
     $message->setBody($content, 'text/html');
     $mailer = new Swift_Mailer($transport);
     $result = $mailer->send($message);
+}
+
+//Счетчик количества ставок
+function count_rates($link, $lot_id) {
+	
+	$sql = 'SELECT COUNT(*) as count FROM rate
+			WHERE lot_id = '.$lot_id.'
+			;';
+	$result      = mysqli_query($link, $sql);
+	$items_count = mysqli_fetch_assoc($result);
+	$items_count = $items_count['count'] ?? 0;
+ 		if ($result == false) {
+		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
+		}
+		if ($result == true) {
+			if ($items_count == 0) {
+				return "Стартовая цена";
+			} else {
+				return $items_count.' '.get_noun_plural_form($items_count, 'ставка', 'ставки', 'ставок');
+			}
+		} 
 }
