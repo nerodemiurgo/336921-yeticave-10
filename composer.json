@@ -1,0 +1,9 @@
+{
+    "name": "nerodemiurgo/yeticave",
+    "description": "Learning project with htmlacademy",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "swiftmailer/swiftmailer": "^6.0"
+    }
+}

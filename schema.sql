@@ -25,7 +25,6 @@ CREATE TABLE user (
 	user_name CHAR(128) NOT NULL,
 	email CHAR(128) NOT NULL UNIQUE,
 	password CHAR(128) NOT NULL,
-	avatar CHAR(128),
 	contact CHAR(255) NOT NULL
 );
 
@@ -42,3 +41,6 @@ CREATE TABLE rate (
 	user_id INT NOT NULL,
 	lot_id INT NOT NULL
 );
+
+/* Добавление индексов для фуллтекст поиска */
+CREATE FULLTEXT INDEX lot_ft_search ON lot (name, description);
