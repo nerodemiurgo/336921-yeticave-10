@@ -163,7 +163,7 @@ function validateStartPrice($start_price) {
 
 //Проверка даты завершения
 function validateDtFinish($dt_finish) {
-	$dt_finish = $_POST[$dt_finish] ?? 0; /* Как здесь сделать защиту от инъекций? */
+	$dt_finish = $_POST[$dt_finish] ?? 0;
 	$date = is_date_valid($dt_finish);
 	$now = time();
 	if ($date == true) {
@@ -232,7 +232,7 @@ function validateRate($new_rate, $price, $rate_step) {
 
 //Проверка корректности email
 function validateEmail($email) {
-	$email = $_POST[$email] ?? 0;  /* Как здесь сделать защиту от инъекций? */
+	$email = $_POST[$email] ?? 0;  
 	if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
 		return null;
 	} 

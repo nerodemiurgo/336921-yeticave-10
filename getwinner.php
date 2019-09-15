@@ -2,6 +2,7 @@
 //Подключаем функции
 require_once('init.php');
 require_once('vendor/autoload.php');
+$last_rate = [];
 
 	$sql_lot = 'SELECT
 		id,
@@ -18,12 +19,9 @@ require_once('vendor/autoload.php');
 	
 	
 	if (!empty($lots)) {
-		foreach ($lots as $item) {
-		$lot_id[] = $item['id'];
-		};
+		$lot_id = array_column($lots, 'id');
 		
- 			foreach ($lot_id as $item) {
-			$sql_rate = 'SELECT
+			$sql_rate = "SELECT
 			r.created_at,
 			r.user_id,
 			r.lot_id AS lot_id,
@@ -34,24 +32,22 @@ require_once('vendor/autoload.php');
 				FROM rate r 
 				JOIN user u ON u.id = r.user_id
 				JOIN lot l ON l.id = r.lot_id
-				WHERE r.lot_id = '.$item.'
+				WHERE r.lot_id IN (".implode(', ',$lot_id).")
 				ORDER BY r.created_at DESC LIMIT 1
-				';
+				";
 			$stmt = db_get_prepare_stmt($link, $sql_rate);
 			mysqli_stmt_execute($stmt);
 			$result_rate = mysqli_stmt_get_result($stmt);
 			$last_rate = mysqli_fetch_all($result_rate, MYSQLI_ASSOC);
-			$arr_rate[] = array_merge($last_rate);
-			$arr_rate = array_filter($arr_rate);
-			}
 	}
-		foreach ($arr_rate AS $item) {
-			$result_winner = mysqli_query($link, "UPDATE lot SET winner_id = ".$item[0]['user_id']." WHERE id = ".$item[0]['lot_id']);
+
+ 		foreach ($last_rate AS $item) {
+			$result_winner = mysqli_query($link, "UPDATE lot SET winner_id = ".$item['user_id']." WHERE id = ".$item['lot_id']);
 			
-			$user_name = $item[0]['user_name'];
-			$mail = $item[0]['email'];
-			$lot_id = $item[0]['lot_id'];
-			$lot_name = $item[0]['lot_name'];
+			$user_name = $item['user_name'];
+			$mail = $item['email'];
+			$lot_id = $item['lot_id'];
+			$lot_name = $item['lot_name'];
 			
 			if ($result_winner) {
 			    $email = include_template('email.php', [
@@ -61,4 +57,4 @@ require_once('vendor/autoload.php');
 				]);
                 send_message($user_name, $email, $mail); 
 			};
-		};
+		}; 
