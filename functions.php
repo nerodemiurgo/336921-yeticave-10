@@ -1,77 +1,165 @@
 <?php
 date_default_timezone_set("Europe/Moscow");
 
-//Функция оформления цены
-function decorate_price ($price_num) {
+/**
+ * Оформляет цену, разделяя ее на порядки и добавляя ₽
+ *
+ * Примеры использования:
+ * decorate_price('123456789'); // 123 456 789₽
+ *
+ * @param integer $price_num Цена в виде целого числа
+ *
+ * @return string цена, разбитая на порядки ₽
+ */
+function decorate_price($price_num)
+{
     return number_format(ceil($price_num), 0, ' ', ' ') . '₽';
 }
 
-//Функция таймера до закрытия лота
-function timeuptoend ($end_date) {
-		$cur_ts = time();
-		$end_ts = strtotime($end_date);
-		$ts_diff = $end_ts - $cur_ts;
-		$min_diff = $ts_diff%3600;
-		
-		$hourse_to_end = str_pad(floor($ts_diff/3600), 2, "0", STR_PAD_LEFT);
-		$minutes_to_end = str_pad(floor($min_diff/60), 2, "0", STR_PAD_LEFT);
+/**
+ * Создает таймер времени до закрытия лота
+ * Дни пересчитывает в часы, оставшиеся до целого часа минуты пишет
+ * в минуты
+ *
+ * Примеры использования:
+ * timeuptoend($end_date); // HH : ii
+ *
+ * @param string $end_date Дата в виде строки
+ *
+ * @return array [часы до окончания, минуты до окончания]
+ */
+function timeuptoend($end_date)
+{
+    $cur_ts = time();
+    $end_ts = strtotime($end_date);
+    $ts_diff = $end_ts - $cur_ts;
+    $min_diff = $ts_diff % 3600;
 
-		return [$hourse_to_end, $minutes_to_end];
+    $hourse_to_end = str_pad(floor($ts_diff / 3600), 2, "0", STR_PAD_LEFT);
+    $minutes_to_end = str_pad(floor($min_diff / 60), 2, "0", STR_PAD_LEFT);
+
+    return [$hourse_to_end, $minutes_to_end];
 }
 
-//Функция для получения списка категорий
-function getCategories ($sql_link) {
-	$sql = 'SELECT id, name, code FROM category;';
-	$result = mysqli_query($sql_link, $sql);
-	
-		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		}
-	
-	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+/**
+ * Получает список категорий из базы данных
+ *
+ * Примеры использования:
+ * getCategories($sql_link); // массив со всеми имеющиемся категориями
+ *
+ * @param $sql_link mysqli Ресурс соединения
+ *
+ * @return array [id, код и название категорий] при true, ошибка sql при false
+ */
+function getCategories($sql_link)
+{
+    $sql = 'SELECT id, name, code FROM category;';
+    $result = mysqli_query($sql_link, $sql);
+
+    if ($result === false) {
+        die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($sql_link));
+    }
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-//Функция для получения списка юзеров
-function getUsers ($sql_link) {
-	$sql = 'SELECT id, user_name, email, password, contact FROM user;';
-	$result = mysqli_query($sql_link, $sql);
-	
-		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		}
-	
-	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+/**
+ * Получает список пользователей из базы данных
+ *
+ * Примеры использования:
+ * getUsers($sql_link); // массив со всеми данными всех имеющихся пользователей
+ *
+ * @param $sql_link mysqli Ресурс соединения
+ *
+ * @return array [id,имя, мейл, пароль, контакты всех пользователей] при true, ошибка sql при false
+ */
+function getUsers($sql_link)
+{
+    $sql = 'SELECT id, user_name, email, password, contact FROM user;';
+    $result = mysqli_query($sql_link, $sql);
+
+    if ($result === false) {
+        die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($sql_link));
+    }
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-//Функция для получения списка лотов
-function getLots ($sql_link) {
-	$sql = 'SELECT l.name AS lot_name, c.name AS category_name, start_price, price, img, dt_finish, l.id AS lot_id FROM lot l
+/**
+ * Получает все активные лоты
+ *
+ * Примеры использования:
+ * getLots($sql_link); // массив со всеми лотами, дата завершения торгов которых больше текущей минимум на 1 день
+ *
+ * @param $sql_link mysqli Ресурс соединения
+ *
+ * @return array [id, название, категория, стартовая цена, цена, изображение,
+ * дата окончания торгов всех активных лотов] при true, ошибка sql при false
+ */
+function getLots($sql_link)
+{
+    $sql = 'SELECT l.name AS lot_name, c.name AS category_name, start_price, price, img, dt_finish, l.id AS lot_id
+            FROM lot l
 			JOIN category c
 			ON l.category_id = c.id  WHERE dt_finish > NOW()
 			ORDER BY created_at DESC;';
-	$result = mysqli_query($sql_link, $sql);
-	
-		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		}
-	
-	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $result = mysqli_query($sql_link, $sql);
+
+    if ($result === false) {
+        die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($sql_link));
+    }
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+/**
+ * Получает список пользователей из базы данных
+ *
+ * Примеры использования:
+ * getUsers($sql_link); // массив со всеми данными всех имеющихся пользователей
+ *
+ * @param $sql_link mysqli Ресурс соединения
+ *
+ * @return array [id,имя, мейл, пароль, контакты всех пользователей] при true, ошибка sql при false
+ */
+function getLot($sql_link, $link_id)
+{
+    if ($link_id == '') {
+        $link_id = 0;
+    }
+
+    $sql = 'SELECT
+        l.id AS lot_id,
+        l.name AS lot_name,
+        l.description AS lot_desc,
+        l.img AS img,
+        l.start_price AS start_price,
+        l.price AS price,
+        l.dt_finish AS dt_finish,
+        l.rate_step AS rate_step,
+        l.category_id,
+        l.author_id AS author_id,
+        c.name AS category_name
+        FROM lot l
+        JOIN category c ON l.category_id = c.id
+        WHERE l.id = ' . $link_id . '';
+
+    $result = mysqli_query($sql_link, $sql);
+    if ($result === false) {
+        die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($sql_link));
+    }
+
+    return mysqli_fetch_assoc($result);
 }
 
-function getLot ($sql_link, $link_id) {
-	if ($link_id == '') {$link_id = 0;}
-	
-	$sql = 'SELECT l.id AS lot_id, l.name AS lot_name, l.description AS lot_desc, l.img AS img, l.start_price AS start_price, l.price AS price, l.dt_finish AS dt_finish, l.rate_step AS rate_step, l.category_id, l.author_id AS author_id, c.name AS category_name FROM lot l JOIN category c ON l.category_id = c.id WHERE l.id = '.$link_id.'';
-	
-	$result = mysqli_query($sql_link, $sql);
-		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		}
-	
-	return mysqli_fetch_assoc($result);
-}
+/**
+ * Отправляет массив в БД
 
-//Функция для отправки массива в БД
+ * @param $link mysqli Ресурс соединения
+ * @param $sql mysqli Подготовленное sql выражение
+ * @param $data = [] массив с данными, которые нужно отправить
+ *
+ * @return отправленные а базу данных данные
+ */
 function db_insert_data($link, $sql, $data = [])
 {
     $stmt = db_get_prepare_stmt($link, $sql, $data);
@@ -83,7 +171,23 @@ function db_insert_data($link, $sql, $data = [])
     return $result;
 }
 
-//Функция для создания лота
+/**
+ * Функция создания нового лота
+ * Отправляет данные о новом лоте из формы создания лота в базу данных
+ *
+ * @param $connection mysqli Ресурс соединения
+ * @param string $name Ресурс название лота
+ * @param string $description описание лота
+ * @param integer $startPrice стартовая цена
+ * @param integer $price цена на текущий момент (стартовая - для нового лота)
+ * @param string $finishingDate дата окончания торгов в формате ГГГГ - ММ - ДД
+ * @param integer $rateStep шаг ставки
+ * @param integer $categoryId Id категории
+ * @param string $imageUrl ссылка на изображение
+ * @param integer $authorId Id автора объявления
+ *
+ * @return добавленный в базу данных лот
+ */
 function createLot(
     $connection,
     $name,
@@ -120,13 +224,24 @@ SQL;
     );
 }
 
-//Функция для создания юзера
+/**
+ * Функция создания нового пользователя
+ * Отправляет данные о новом пользователе из формы регистрации в базу данных
+ *
+ * @param $connection mysqli Ресурс соединения
+ * @param string $email емейл пользователя
+ * @param string $password хэш пароля
+ * @param string $user_name имя пользователы
+ * @param string $contact контакты пользователя
+ *
+ * @return добавленный в базу данных пользователь
+ */
 function createUser(
-	$connection,
-	$email,
-	$password,
-	$user_name,
-	$contact
+    $connection,
+    $email,
+    $password,
+    $user_name,
+    $contact
 ) {
     $sql = <<<SQL
 INSERT INTO user
@@ -147,120 +262,256 @@ SQL;
     );
 }
 
-//Функция сохранения заполненных значений формы
-function getPostVal($name) {
-	return $_POST[$name] ?? '';
+/**
+ * Функция сохранения заполненных значений формы
+ * Восстанавливает заполненное значение при перезагрузке формы
+ *
+ * @param string $name значение формы
+ *
+ * @return значение из формы
+ */
+function getPostVal($name)
+{
+    return $_POST[$name] ?? '';
 }
 
-//Проверка начальной цены
-function validateStartPrice($start_price) {
-	$start_price = intval($_POST[$start_price]) ?? 0;
-	if ($start_price <= 0) {
-		return "Стартовая цена должна быть больше нуля";
-	}
-	return null;
+/**
+ * Валидация начальной цены
+ *
+ * @param integer $start_price стартовая цена для лота
+ *
+ * @return null, если цена - число больше нуля, текст ошибки, если нет
+ */
+function validateStartPrice($start_price)
+{
+    $start_price = intval($_POST[$start_price]) ?? 0;
+    if ($start_price <= 0) {
+        return "Стартовая цена должна быть числом больше нуля";
+    }
+    return null;
 }
 
-//Проверка даты завершения
-function validateDtFinish($dt_finish) {
-	$dt_finish = $_POST[$dt_finish] ?? 0;
-	$date = is_date_valid($dt_finish);
-	$now = time();
-	if ($date == true) {
-		$str_date = strtotime($dt_finish);
-		$tomorrow = strtotime('tomorrow');
-		if ($str_date >= $tomorrow) {
-			return null;
-		} else {
-			return "Дата завершения не должна быть меньше завтрашней";
-		}
-	} 
-	if ($date == false) {
-		return "Формат даты должен быть ГГГГ-ММ-ДД";
-	}
-}
-	
-	//Проверка шага ставки
-function validateRateStep($rate_step) {
-	$rate_step = intval($_POST[$rate_step]) ?? 0;
-	if ($rate_step < 0 ) {
-		return "Шаг ставки не может быть отрицательным числом";
-	} else {	
-		$checkRateStep = ctype_digit($rate_step);
-		
-		if ($checkRateStep == true) {
-			if ($rate_step > 0) {
-			return null;
-			}
-			if ($rate_step == 0) {
-			return "Шаг ставки не может быть равен нулю";
-			}
-		}
-			if ($checkRateStep == false) {
-			return "Шаг ставки должен быть целым числом";
-			}
-	}
+/**
+ * Валидация даты окончания торгов
+ *
+ * Поверяет, что дата окончания минимум на сутки больше текущей и соответствует формату ГГГГ-ММ-ДД
+ *
+ * @param string $dt_finish дата окончания торгов в формате строки
+ *
+ * @return null, если условия верны, текст ошибки, если нет
+ */
+function validateDtFinish($dt_finish)
+{
+    $dt_finish = $_POST[$dt_finish] ?? 0;
+    $date = is_date_valid($dt_finish);
+    $now = time();
+    if ($date === true) {
+        $str_date = strtotime($dt_finish);
+        $tomorrow = strtotime('tomorrow');
+        if ($str_date >= $tomorrow) {
+            return null;
+        } else {
+            return "Дата завершения не должна быть меньше завтрашней";
+        }
+    }
+    if ($date === false) {
+        return "Формат даты должен быть ГГГГ-ММ-ДД";
+    }
 }
 
-	//Проверка ставки
-function validateRate($new_rate, $price, $rate_step) {
-	$new_rate = intval($_POST['bid']) ?? 0;
-	if ($new_rate < 0 ) {
-		return "Ставка не может быть отрицательным числом";
-	} else {	
-		$checkNewRate = ctype_digit($new_rate);
-		
-			if ($checkNewRate == true) {
-				if ($new_rate > 0) {
-						$new_price = $price+$rate_step;
-					if ($new_rate < $new_price) {
-						return "Ставка не должна быть меньше $new_price";
-					}
-					if ($new_rate >= $new_price) {
-						return null;
-					}
-				}
-				if ($new_rate == 0) {
-				return "Ставка не может быть равна нулю";
-				}
-			}
-			if ($checkNewRate == false) {
-			return "Ставка должна быть целым числом";
-			}
-	}
+/**
+ * Валидация шага ставки
+ *
+ * Поверяет, шаг ставки больше нуля, является целым числом
+ *
+ * @param integer $rate_step шаг ставки
+ *
+ * @return null, если условия верны, текст ошибки, если нет
+ */
+function validateRateStep($rate_step)
+{
+    $rate_step = $_POST[$rate_step] ?? 0;
+    if ($rate_step < 0) {
+        return "Шаг ставки не может быть отрицательным числом";
+    } else {
+        $checkRateStep = ctype_digit($rate_step);
+
+        if ($checkRateStep === true) {
+            if ($rate_step > 0) {
+                return null;
+            }
+            if ($rate_step === 0) {
+                return "Шаг ставки не может быть равен нулю";
+            }
+        }
+        if ($checkRateStep === false) {
+            return "Шаг ставки должен быть целым числом";
+        }
+    }
 }
 
-//Проверка корректности email
-function validateEmail($email) {
-	$email = $_POST[$email] ?? 0;  
-	if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
-		return null;
-	} 
-	else {
-		return "Формат email должен соответствовать example@email.com";
-	}
+/**
+ * Валидация ставки
+ *
+ * Поверяет, что ставка не меньше текущей цены+шаг ставки, является целым положительным числом
+ *
+ * @param integer $new_rate размер ставки из формы
+ * @param integer $price текущая цена лота
+ * @param integer $rate_step шаг ставки лота
+ *
+ * @return null, если условия верны, текст ошибки, если нет
+ */
+function validateRate($new_rate, $price, $rate_step)
+{
+    $new_rate = $_POST['bid'] ?? 0;
+    if ($new_rate < 0) {
+        return "Ставка не может быть отрицательным числом";
+    } else {
+        $checkNewRate = ctype_digit($new_rate);
+
+        if ($checkNewRate === true) {
+            if ($new_rate > 0) {
+                $new_price = $price + $rate_step;
+                if ($new_rate < $new_price) {
+                    return "Ставка не должна быть меньше $new_price";
+                }
+                if ($new_rate >= $new_price) {
+                    return null;
+                }
+            }
+            if ($new_rate === 0) {
+                return "Ставка не может быть равна нулю";
+            }
+        }
+        if ($checkNewRate === false) {
+            return "Ставка должна быть целым числом";
+        }
+    }
 }
 
-//Функция для получения истории ставок
-function getHistoryRates ($sql_link, $lot_id) {
-	$lot_id = intval($_GET['id']) ?? 0;
-	$sql = 'SELECT r.created_at AS time, r.bid AS bid, r.user_id AS user_id, r.lot_id, u.user_name FROM rate r
+/**
+ * Валидация емейла
+ *
+ * Поверяет, что емейл корректного вида и его длина не превышает длину отведенного в БД поля
+ *
+ * @param string $email емейл пользователя
+ *
+ * @return null, если условия верны, текст ошибки, если нет
+ */
+function validateEmail($email)
+{
+    $email = $_POST[$email] ?? 0;
+    $checkemail = strlen($email);
+    if ($checkemail >= 255) {
+        return "Слишком длинный email";
+    } else {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return null;
+        } else {
+            return "Формат email должен соответствовать example@email.com";
+        }
+    }
+}
+
+/**
+ * Валидация имени
+ *
+ * Поверяет, что длина имени не превышает длину отведенного в БД поля
+ *
+ * @param string $item имя пользователя или название лота
+ *
+ * @return null, если условия верны, текст ошибки, если нет
+ */
+function validateName($item)
+{
+    $item = $_POST[$item] ?? 0;
+    $checkitem = strlen($item);
+    if ($checkitem > 128) {
+        return "Нужно что-то более короткое";
+    } else {
+        return null;
+    }
+}
+
+/**
+ * Валидация описания
+ *
+ * Поверяет, что длина описания не превышает длину отведенного в БД поля
+ *
+ * @param string $item описание лота
+ *
+ * @return null, если условия верны, текст ошибки, если нет
+ */
+function validateDesc($item)
+{
+    $item = $_POST[$item] ?? 0;
+    $checkitem = strlen($item);
+    if ($checkitem > 2048) {
+        return "Описание слишком длинное";
+    } else {
+        return null;
+    }
+}
+
+
+/**
+ * Валидация имени
+ *
+ * Поверяет, что длина содержимого поля контактов не превышает длину отведенного в БД поля
+ *
+ * @param string $item содержимое поля контактов
+ *
+ * @return null, если условия верны, текст ошибки, если нет
+ */
+function validateContact($item)
+{
+    $item = $_POST[$item] ?? 0;
+    $checkitem = strlen($item);
+    if ($checkitem > 255) {
+        return "Попробуйте описать свои контакты немного короче :)";
+    } else {
+        return null;
+    }
+}
+
+/**
+ * Получает 10 последних ставок для каждого лота
+ *
+ * @param $sql_link mysqli Ресурс соединения
+ * @param integer $lot_id id лота
+ *
+ * @return массив с историей ставок, если true, ошибку sql, если false
+ */
+function getHistoryRates($sql_link, $lot_id)
+{
+    $lot_id = intval($_GET['id']) ?? 0;
+    $sql = 'SELECT r.created_at AS time, r.bid AS bid, r.user_id AS user_id, r.lot_id, u.user_name FROM rate r
 			JOIN user u
 			ON r.user_id = u.id
-			WHERE r.lot_id = '.$lot_id.'
+			WHERE r.lot_id = ' . $lot_id . '
 			ORDER BY time DESC LIMIT 10
 			
 			;';
-	$result = mysqli_query($sql_link, $sql);
-	
-		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		}
-	
-	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    $result = mysqli_query($sql_link, $sql);
+
+    if ($result === false) {
+        die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($sql_link));
+    }
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-//Функция проверки доступа к форме создания ставки
+/**
+ * Ограничивает доступ к форме ставки
+ *
+ * Ставку можно делать, если пользователь залогинен, не является автором лота, не делал последнюю ставку,
+ * время проведения трогов не истекло
+ *
+ * @param $sql_link mysqli Ресурс соединения
+ * @param array $lot массив с информацией об открытом лоте
+ *
+ * @return true, если все условия выполнены, иначе false
+ */
 function isUserCanMakeBet($sql_link, $lot): bool
 {
     if (!isset($_SESSION['user']['id'], $_GET['id'], $lot['dt_finish'], $lot['author_id'])) {
@@ -283,7 +534,7 @@ function isUserCanMakeBet($sql_link, $lot): bool
     }
 
     $sql = 'SELECT r.created_at AS time, r.user_id AS user_id, r.lot_id FROM rate r
-		WHERE r.lot_id = '.$lot_id.'
+		WHERE r.lot_id = ' . $lot_id . '
 		ORDER BY time DESC LIMIT 1
 		;';
     $result = mysqli_query($sql_link, $sql);
@@ -296,53 +547,85 @@ function isUserCanMakeBet($sql_link, $lot): bool
     return $last_rate['user_id'] !== $user_id;
 }
 
-//Функция возврата класса в строку
-function classToString($dt_finish, $winner_id) {
-	if (isset($winner_id)) {
-		return "rates__item--win";
-	} 
-	
-	$date_now = date_create('now');
-	$date_finish = date_create($dt_finish);
-	if ($date_finish > $date_now) {
-		return null;
-	}
-	if ($date_finish <= $date_now) {
-		return 'rates__item--end';
-	}
+/**
+ * Возвращает класс для оформления строки в списке ставок
+ *
+ * @param string $dt_finish дата окончания торгов
+ * @param integer $winner_id id победителя
+ *
+ * @return rates__item--win, если ставка победила, rates__item--end, если торги завершены, но ставка не победила,
+ * null, если торги еще не завершены
+ */
+function classToString($dt_finish, $winner_id)
+{
+    if (isset($winner_id)) {
+        return "rates__item--win";
+    }
+
+    $date_now = date_create('now');
+    $date_finish = date_create($dt_finish);
+    if ($date_finish > $date_now) {
+        return null;
+    }
+    if ($date_finish <= $date_now) {
+        return 'rates__item--end';
+    }
 }
 
-//Функция красивого вывода времени, прошедшего от ставки
-function timeFromBet($rate_time) {
-		$time_bet = '';
-		$date_now = date_create('now');
-		$date_rate = date_create($rate_time);
-		$date_diff = date_diff($date_rate, $date_now);
-		$hour = date_interval_format($date_diff, '%d %h %i');
-		$time_bet = explode(' ', $hour);	
+/**
+ * Оформление периода времени, прошедшего со ставки
+ *
+ * Примеры использования:
+ * timeFromBet($rate_time); // 5 дней 6 часов 15 минут назад
+ *
+ * @param date $rate_time время создания ставки
+ *
+ * @return строку с описанием количества прошедшего времени
+ */
+function timeFromBet($rate_time)
+{
+    $time_bet = '';
+    $date_now = date_create('now');
+    $date_rate = date_create($rate_time);
+    $date_diff = date_diff($date_rate, $date_now);
+    $hour = date_interval_format($date_diff, '%d %h %i');
+    $time_bet = explode(' ', $hour);
 
-	$correctTime = '';
-	if ($time_bet[0] > 0) {
-		$correctTime = $time_bet[0].' '.get_noun_plural_form($time_bet[0], 'день', 'дня', 'дней').' ';
-		$correctTime = $correctTime.$time_bet[1].' '.get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов').' ';
-		$correctTime = $correctTime.$time_bet[2].' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
-	} 
-	if ($time_bet[0] == 0){
-		if ($time_bet[1] > 0) {
-			$correctTime = $time_bet[1].' '.get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов').' ';
-			$correctTime = $correctTime.$time_bet[2].' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
-		} else if ($time_bet[1] == 0) {
-			$correctTime = $time_bet[2].' '.get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
-		}
-	}
+    $correctTime = '';
+    if ($time_bet[0] > 0) {
+        $correctTime = $time_bet[0] . ' ' . get_noun_plural_form($time_bet[0], 'день', 'дня', 'дней') . ' ';
+        $correctTime = $correctTime . $time_bet[1] . ' ' . get_noun_plural_form($time_bet[1], 'час', 'часа',
+                'часов') . ' ';
+        $correctTime = $correctTime . $time_bet[2] . ' ' . get_noun_plural_form($time_bet[2], 'минута', 'минуты',
+                'минут');
+    }
+    if ($time_bet[0] == 0) {
+        if ($time_bet[1] > 0) {
+            $correctTime = $time_bet[1] . ' ' . get_noun_plural_form($time_bet[1], 'час', 'часа', 'часов') . ' ';
+            $correctTime = $correctTime . $time_bet[2] . ' ' . get_noun_plural_form($time_bet[2], 'минута', 'минуты',
+                    'минут');
+        } else {
+            if ($time_bet[1] == 0) {
+                $correctTime = $time_bet[2] . ' ' . get_noun_plural_form($time_bet[2], 'минута', 'минуты', 'минут');
+            }
+        }
+    }
 
-    return $correctTime." назад";
+    return $correctTime . " назад";
 }
 
-//Функция для получения информации о своих ставках
-function getMyLots ($sql_link, $user_id) {
-	$user_id = intval($user_id);
-	$sql = 'SELECT MAX(r.id),
+/**
+ * Получение информации о своих ставках
+ *
+ * @param $sql_link mysqli Ресурс соединения
+ * @param integer $user_id Идентификатор пользователя, для которого получаем ставки
+ *
+ * @return массив со ставками юзера, если true, ошибку sql, если false
+ */
+function getMyLots($sql_link, $user_id)
+{
+    $user_id = intval($user_id);
+    $sql = 'SELECT MAX(r.id),
        MAX(r.created_at) AS time,
        r.user_id,
        r.lot_id,
@@ -361,25 +644,35 @@ function getMyLots ($sql_link, $user_id) {
 			 JOIN lot l ON r.lot_id = l.id
 			 JOIN category c ON l.category_id = c.id
 			 JOIN user u ON l.author_id = u.id
-	WHERE r.user_id = '.$user_id.'
+	WHERE r.user_id = ' . $user_id . '
 	GROUP BY l.id
 	ORDER BY time DESC';
-		
-	$result = mysqli_query($sql_link, $sql);
-	
-		if ($result === false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		}
-	
-	return mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+    $result = mysqli_query($sql_link, $sql);
+
+    if ($result === false) {
+        die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($sql_link));
+    }
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-function send_message($user_name, $content, $email) 
+
+/**
+ * Отправляет емейл о победе ставки
+ *
+ * @param string $user_name Имя победителя
+ * @param string $content содержимое шаблона письма
+ * @param string $email Адрес победителя
+ *
+ * @return отправлен емейл
+ */
+function send_message($user_name, $content, $email)
 {
     $transport = new Swift_SmtpTransport('phpdemo.ru', 25);
     $transport->setPassword('htmlacademy');
     $transport->setUsername('keks@phpdemo.ru');
-	
+
     $message = new Swift_Message('Ваша ставка победила');
     $message->setTo([$email, $email => $user_name]);
     $message->setFrom(['keks@phpdemo.ru' => 'YetiCave']);
@@ -388,23 +681,37 @@ function send_message($user_name, $content, $email)
     $result = $mailer->send($message);
 }
 
-//Счетчик количества ставок
-function count_rates($link, $lot_id) {
-	
-	$sql = 'SELECT COUNT(*) as count FROM rate
-			WHERE lot_id = '.$lot_id.'
+/**
+ * Счетчик количества сделанных в лоте ставок
+ *
+ * Пример использования:
+ * count_rates($link, $lot_id) // 6 ставок
+ * count_rates($link, $lot_id) // 2 ставки
+ * count_rates($link, $lot_id) // 1 ставка
+ * count_rates($link, $lot_id) // Стартовая цена
+ *
+ * @param $link mysqli Ресурс соединения
+ * @param integer $lot_id id лота
+ *
+ * @return строка с числом ставок и корректным склонением
+ */
+/*function count_rates($link, $lot_id)
+{
+
+    $sql = 'SELECT COUNT(*) as count FROM rate
+			WHERE lot_id = ' . $lot_id . '
 			;';
-	$result      = mysqli_query($link, $sql);
-	$items_count = mysqli_fetch_assoc($result);
-	$items_count = $items_count['count'] ?? 0;
- 		if ($result == false) {
-		die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($sql_link));
-		}
-		if ($result == true) {
-			if ($items_count == 0) {
-				return "Стартовая цена";
-			} else {
-				return $items_count.' '.get_noun_plural_form($items_count, 'ставка', 'ставки', 'ставок');
-			}
-		} 
-}
+    $result = mysqli_query($link, $sql);
+    $items_count = mysqli_fetch_assoc($result);
+    $items_count = $items_count['count'] ?? 0;
+    if ($result === false) {
+        exit("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($link));
+    }
+    if ($result === true) {
+        if ($items_count == 0) {
+            return "Стартовая цена";
+        } else {
+            return $items_count . ' ' . get_noun_plural_form($items_count, 'ставка', 'ставки', 'ставок');
+        }
+    }
+}*/
