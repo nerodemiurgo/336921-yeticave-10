@@ -680,38 +680,3 @@ function send_message($user_name, $content, $email)
     $mailer = new Swift_Mailer($transport);
     $result = $mailer->send($message);
 }
-
-/**
- * Счетчик количества сделанных в лоте ставок
- *
- * Пример использования:
- * count_rates($link, $lot_id) // 6 ставок
- * count_rates($link, $lot_id) // 2 ставки
- * count_rates($link, $lot_id) // 1 ставка
- * count_rates($link, $lot_id) // Стартовая цена
- *
- * @param $link mysqli Ресурс соединения
- * @param integer $lot_id id лота
- *
- * @return строка с числом ставок и корректным склонением
- */
-/*function count_rates($link, $lot_id)
-{
-
-    $sql = 'SELECT COUNT(*) as count FROM rate
-			WHERE lot_id = ' . $lot_id . '
-			;';
-    $result = mysqli_query($link, $sql);
-    $items_count = mysqli_fetch_assoc($result);
-    $items_count = $items_count['count'] ?? 0;
-    if ($result === false) {
-        exit("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($link));
-    }
-    if ($result === true) {
-        if ($items_count == 0) {
-            return "Стартовая цена";
-        } else {
-            return $items_count . ' ' . get_noun_plural_form($items_count, 'ставка', 'ставки', 'ставок');
-        }
-    }
-}*/
