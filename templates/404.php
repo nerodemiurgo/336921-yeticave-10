@@ -36,7 +36,7 @@
                         <li class="user-menu__item">
                             <a href="/enter.php">Вход</a>
                         </li>
-                    </ul
+                    </ul>
                 <?php endif; ?>
             </nav>
         </div>

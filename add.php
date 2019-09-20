@@ -3,7 +3,7 @@
 require_once('init.php');
 
 if (empty($_SESSION['user'])) {
-    header("HTTP/1.0 403 (Forbidden, доступ запрещен");
+    header('HTTP/1.0 403 (Forbidden, доступ запрещен)');
     exit;
 }
 
@@ -19,12 +19,12 @@ $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //Копируем все данные из массива POST
     $newlot = [
-        'name' => mysqli_real_escape_string($link, $_POST['name']) ?? null,
-        'category' => mysqli_real_escape_string($link, $_POST['category']) ?? null,
+        'name'        => mysqli_real_escape_string($link, $_POST['name']) ?? null,
+        'category'    => mysqli_real_escape_string($link, $_POST['category']) ?? null,
         'description' => mysqli_real_escape_string($link, $_POST['description']) ?? null,
         'start_price' => mysqli_real_escape_string($link, $_POST['start_price']) ?? null,
-        'rate_step' => mysqli_real_escape_string($link, $_POST['rate_step']) ?? null,
-        'dt_finish' => mysqli_real_escape_string($link, $_POST['dt_finish']) ?? null
+        'rate_step'   => mysqli_real_escape_string($link, $_POST['rate_step']) ?? null,
+        'dt_finish'   => mysqli_real_escape_string($link, $_POST['dt_finish']) ?? null
     ];
 
     //Объявляем массив проверок
@@ -40,8 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         },
         'name' => function () {
             return validateName('name');
-        }
-        ,
+        },
         'description' => function () {
             return validateDesc('description');
         }
@@ -70,25 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         //Валидация изображения
-        if (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] === UPLOAD_ERR_NO_FILE) {
-            $errors['lot-img'] = 'Вы не загрузили изображение';
-        } elseif (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] !== UPLOAD_ERR_OK) {
-            $errors['lot-img'] = 'Не удалось загрузить изображение';
+        $checkImg = validateImg();
+        if (empty($checkImg[0])) {
+            $newlot['lot-img'] = $checkImg[1];
+            move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/'.$checkImg[1]);
         } else {
-            $tmp_name = $_FILES['lot-img']['tmp_name'];
-            $file_type = mime_content_type($tmp_name);
-
-            if ($file_type == "image/jpeg") {
-                $filename = uniqid() . '.jpg';
-                $newlot['lot-img'] = $filename;
-                move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/' . $filename);
-            } elseif ($file_type == "image/png") {
-                $filename = uniqid() . '.png';
-                $newlot['lot-img'] = $filename;
-                move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/' . $filename);
-            } else {
-                $errors['lot-img'] = 'Изображение должно быть формата jpg или png';
-            }
+            $errors['lot-img'] = $checkImg[1];
         }
     }
 
@@ -99,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($res) {
             $newlot_id = mysqli_insert_id($link);
-            header("Location: /lot.php?id=" . $newlot_id);
+            header('Location: /lot.php?id='.$newlot_id);
         } else {
             print (mysqli_error($link));
         }
@@ -109,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //Формируем контент страницы
 $page_content = include_template('add-lot.php', [
     'categories' => $categories,
-    'errors' => $errors
+    'errors'     => $errors
 ]);
 
 //Задаем тайтл
@@ -117,9 +103,9 @@ $title = 'Добавление лота';
 
 //Включаем шаблон layout
 $layout_content = include_template('backpage.php', [
-    'title' => $title,
+    'title'      => $title,
     'categories' => $categories,
-    'content' => $page_content
+    'content'    => $page_content
 ]);
 
 print($layout_content);

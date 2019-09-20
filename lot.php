@@ -23,7 +23,7 @@ $lot_info = getLot($link, $checkID);
 
 //Вывод ошибки, если пришел пустой массив (id объявления не существует)
 $checkLotInfo = count($lot_info);
-if ($checkLotInfo === 0) {
+if ($checkLotInfo == 0) {
     print ($error404);
     die;
 }
@@ -64,12 +64,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $updatePrice = mysqli_query($link, "UPDATE lot SET price = $bid WHERE id = $lot_id");
 
         if ($newRate && $updatePrice) {
-            mysqli_query($link, "COMMIT");
+            mysqli_query($link, 'COMMIT');
         } else {
-            mysqli_query($link, "ROLLBACK");
+            mysqli_query($link, 'ROLLBACK');
         }
 
-        header('Location: /lot.php?id=' . $lot_id);
+        header('Location: /lot.php?id='.$lot_id);
         exit;
     }
 }
@@ -81,9 +81,9 @@ $canseebets = isUserCanMakeBet($link, $lot_info);
 //Формируем контент страницы
 $page_content = include_template('lotpage.php', [
     'categories' => $categories,
-    'lot_info' => $lot_info,
-    'errors' => $errors,
-    'rates' => $rates,
+    'lot_info'   => $lot_info,
+    'errors'     => $errors,
+    'rates'      => $rates,
     'canseebets' => $canseebets
 ]);
 
@@ -92,9 +92,9 @@ $title = $lot_info['lot_name'];
 
 //Включаем шаблон layout
 $layout_content = include_template('backpage.php', [
-    'title' => $title,
+    'title'      => $title,
     'categories' => $categories,
-    'content' => $page_content
+    'content'    => $page_content
 ]);
 
 print($layout_content);
