@@ -20,7 +20,7 @@ $lots = mysqli_fetch_all($result_lot, MYSQLI_ASSOC);
 if (!empty($lots)) {
     $lot_id = array_column($lots, 'id');
 
-    $sql_rate = 'SELECT
+    $sql_rate = "SELECT
             r.created_at,
             r.user_id,
             r.lot_id AS lot_id,
@@ -33,7 +33,7 @@ if (!empty($lots)) {
                 JOIN lot l ON l.id = r.lot_id
                 WHERE r.lot_id IN (".implode(', ', $lot_id).")
                 ORDER BY r.created_at DESC LIMIT 1
-                ';
+                ";
     $stmt = db_get_prepare_stmt($link, $sql_rate);
     mysqli_stmt_execute($stmt);
     $result_rate = mysqli_stmt_get_result($stmt);
