@@ -23,7 +23,7 @@ $sql = 'SELECT
         COUNT(l.id) as count
             FROM lot l
             JOIN category c ON l.category_id = c.id 
-            WHERE MATCH(l.name, l.description) AGAINST(\'' . $search . '\') AND dt_finish > NOW()
+            WHERE MATCH(l.name, l.description) AGAINST(\''.$search.'\') AND dt_finish > NOW()
             ';
 
 $result = mysqli_query($link, $sql);
@@ -52,8 +52,8 @@ $sql = 'SELECT
 
             FROM lot l
             JOIN category c ON l.category_id = c.id 
-            WHERE MATCH(l.name, l.description) AGAINST(\'' . $search . '\') AND dt_finish > NOW()
-            ORDER BY created_at DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
+            WHERE MATCH(l.name, l.description) AGAINST(\''.$search.'\') AND dt_finish > NOW()
+            ORDER BY created_at DESC LIMIT '.$page_items.' OFFSET '.$offset;
 
 $result = mysqli_query($link, $sql);
 $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -70,13 +70,13 @@ for ($n = 0; $n <= 8; $n = $n + 1) {
         $rate_count = $rate_count['count'] ?? 0;
 
         if ($result == false) {
-            die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($link));
+            die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($link));
         }
         if ($result == true) {
             if ($rate_count == 0) {
-                $lots[$n]['rates'] = "Стартовая цена";
+                $lots[$n]['rates'] = 'Стартовая цена';
             } else {
-                $lots[$n]['rates'] = $rate_count . ' ' . get_noun_plural_form($rate_count, 'ставка', 'ставки',
+                $lots[$n]['rates'] = $rate_count.' '.get_noun_plural_form($rate_count, 'ставка', 'ставки',
                         'ставок');
             }
         }
@@ -87,29 +87,29 @@ for ($n = 0; $n <= 8; $n = $n + 1) {
 $pagination = include_template(
     'pagination.php',
     [
-        'search' => $search,
-        'pages' => $pages,
+        'search'      => $search,
+        'pages'       => $pages,
         'pages_count' => $pages_count,
-        'cur_page' => $cur_page
+        'cur_page'    => $cur_page
     ]);
 
 $page_content = include_template(
     'search_page.php',
     [
         'categories' => $categories,
-        'search' => $search,
-        'lots' => $lots,
+        'search'     => $search,
+        'lots'       => $lots,
         'pagination' => $pagination
     ]);
 
 //Задаем тайтл
-$title = 'Поиск ' . $search;
+$title = 'Поиск '.$search;
 
 //Включаем шаблон layout
 $layout_content = include_template('backpage.php', [
-    'title' => $title,
+    'title'      => $title,
     'categories' => $categories,
-    'content' => $page_content
+    'content'    => $page_content
 ]);
 
 print($layout_content);

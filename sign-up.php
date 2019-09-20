@@ -4,7 +4,7 @@
 require_once('init.php');
 
 if (!empty($_SESSION['user'])) {
-    header("HTTP/1.0 403 (Forbidden, доступ запрещен");
+    header('HTTP/1.0 403 (Forbidden, доступ запрещен)');
     exit;
 }
 
@@ -23,10 +23,10 @@ $errors = [];
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     //Копируем все данные из массива POST
     $newuser = [
-        'email' => $_POST['email'] ?? null,
-        'password' => $_POST['password'] ?? null,
+        'email'     => $_POST['email'] ?? null,
+        'password'  => $_POST['password'] ?? null,
         'user_name' => $_POST['user_name'] ?? null,
-        'contact' => $_POST['contact'] ?? null
+        'contact'   => $_POST['contact'] ?? null
     ];
 
     //Объявляем массив проверок
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $errors = array_filter($errors);
 
-    if (empty ($errors)) {
+    if (empty($errors)) {
         //Хэширование пароля
         $newpass = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
@@ -90,8 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //Формируем контент страницы
 $page_content = include_template('signuppage.php', [
     'categories' => $categories,
-    'users' => $users,
-    'errors' => $errors
+    'users'      => $users,
+    'errors'     => $errors
 ]);
 
 //Задаем тайтл
@@ -99,9 +99,9 @@ $title = 'Регистрация';
 
 //Включаем шаблон layout
 $layout_content = include_template('backpage.php', [
-    'title' => $title,
+    'title'      => $title,
     'categories' => $categories,
-    'content' => $page_content
+    'content'    => $page_content
 ]);
 
 print($layout_content);

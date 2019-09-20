@@ -3,7 +3,7 @@
 require_once('init.php');
 
 if (!empty($_SESSION['user'])) {
-    header("HTTP/1.0 403 (Forbidden, доступ запрещен");
+    header('HTTP/1.0 403 (Forbidden, доступ запрещен)');
     exit;
 }
 
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     //Копируем все данные из массива POST
     $userenter = [
-        'email' => mysqli_real_escape_string($link, $_POST['email']) ?? null,
+        'email'    => mysqli_real_escape_string($link, $_POST['email']) ?? null,
         'password' => mysqli_real_escape_string($link, $_POST['password']) ?? null
     ];
 
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 //Формируем контент страницы
 $page_content = include_template('login.php', [
     'categories' => $categories,
-    'errors' => $errors
+    'errors'     => $errors
 ]);
 
 //Задаем тайтл
@@ -80,9 +80,9 @@ $title = 'Вход';
 
 //Включаем шаблон layout
 $layout_content = include_template('backpage.php', [
-    'title' => $title,
+    'title'      => $title,
     'categories' => $categories,
-    'content' => $page_content
+    'content'    => $page_content
 ]);
 
 print($layout_content);

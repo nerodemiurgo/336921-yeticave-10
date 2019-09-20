@@ -1,5 +1,5 @@
 <?php
-$title = 'YetiCave - заголовок страницы';
+$title = 'YetiCave - аукцион стаффа для катки';
 
 //Подключаем функции
 require_once('init.php');
@@ -7,7 +7,7 @@ require_once('getwinner.php');
 
 //Проверка ошибки при подключении БД
 if ($link === false) {
-    exit('Ошибка подключения:' . mysqli_connect_error());
+    exit('Ошибка подключения:'.mysqli_connect_error());
 }
 
 //Объявляем массив с категориями
@@ -19,14 +19,14 @@ $lots_list = getLots($link);
 //Включаем шаблон главной страницы
 $page_content = include_template('main.php', [
     'categories' => $categories,
-    'lots_list' => $lots_list
+    'lots_list'  => $lots_list
 ]);
 
 //Включаем шаблон layout
 $layout_content = include_template('layout.php', [
-    'title' => $title,
+    'title'      => $title,
     'categories' => $categories,
-    'content' => $page_content
+    'content'    => $page_content
 ]);
 
 print($layout_content);

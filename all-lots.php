@@ -20,7 +20,7 @@ $search = mysqli_real_escape_string($link, trim($_GET['cat']));
 $searchLots = '';
 
 //Получаем информацию о категории
-$sqlcat = 'SELECT id, name, code FROM category WHERE code = "' . $search . '";';
+$sqlcat = 'SELECT id, name, code FROM category WHERE code = "'.$search.'";';
 $resultcat = mysqli_query($link, $sqlcat);
 $mycat = mysqli_fetch_assoc($resultcat) ?? null;
 
@@ -28,7 +28,7 @@ $mycat = mysqli_fetch_assoc($resultcat) ?? null;
 $sql = 'SELECT
         COUNT(l.id) as count
             FROM lot l
-            WHERE category_id = "' . $mycat['id'] . '" AND dt_finish > NOW()';
+            WHERE category_id = "'.$mycat['id'].'" AND dt_finish > NOW()';
 			
 $result = mysqli_query($link, $sql);
 $items_count = mysqli_fetch_assoc($result);
@@ -56,14 +56,14 @@ $sql = 'SELECT
 
             FROM lot l
             JOIN category c ON l.category_id = c.id 
-            WHERE category_id = "' . $mycat['id'] . '" AND dt_finish > NOW()
-            ORDER BY created_at DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
+            WHERE category_id = "'.$mycat['id'].'" AND dt_finish > NOW()
+            ORDER BY created_at DESC LIMIT '.$page_items.' OFFSET '.$offset;
 
 $result = mysqli_query($link, $sql);
 if ($result) {
     $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
 } else {
-    die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: " . mysqli_error($link));
+    die("Ошибка при выполнении запроса '$sql'.<br> Текст ошибки: ".mysqli_error($link));
 }
 
 //Добавление количества ставок
@@ -71,7 +71,7 @@ for ($n = 0; $n <= 8; $n = $n + 1) {
     if (isset($lots[$n]['lot_id'])) {
         $lot_id = $lots[$n]['lot_id'];
         $sql = 'SELECT COUNT(*) as count FROM rate
-                WHERE lot_id = ' . $lot_id . '
+                WHERE lot_id = '.$lot_id.'
                 ;';
         $result = mysqli_query($link, $sql);
         $rate_count = mysqli_fetch_assoc($result);
@@ -82,9 +82,9 @@ for ($n = 0; $n <= 8; $n = $n + 1) {
         }
         if ($result == true) {
             if ($rate_count == 0) {
-                $lots[$n]['rates'] = "Стартовая цена";
+                $lots[$n]['rates'] = 'Стартовая цена';
             } else {
-                $lots[$n]['rates'] = $rate_count . ' ' . get_noun_plural_form($rate_count, 'ставка', 'ставки',
+                $lots[$n]['rates'] = $rate_count.' '.get_noun_plural_form($rate_count, 'ставка', 'ставки',
                         'ставок');
             }
         }
@@ -95,23 +95,23 @@ for ($n = 0; $n <= 8; $n = $n + 1) {
 $page_content = include_template(
     'all-lots.php',
     [
-        'categories' => $categories,
-        'search' => $search,
-        'lots' => $lots,
-        'pages' => $pages,
+        'categories'  => $categories,
+        'search'      => $search,
+        'lots'        => $lots,
+        'pages'       => $pages,
         'pages_count' => $pages_count,
-        'cur_page' => $cur_page,
-        'mycat' => $mycat
+        'cur_page'    => $cur_page,
+        'mycat'       => $mycat
     ]);
 
 //Задаем тайтл
-$title = 'Лоты категории ' . $mycat['name'] ?? null;
+$title = 'Лоты категории '.$mycat['name'] ?? null;
 
 //Включаем шаблон layout
 $layout_content = include_template('backpage.php', [
-    'title' => $title,
+    'title'      => $title,
     'categories' => $categories,
-    'content' => $page_content
+    'content'    => $page_content
 ]);
 
 print($layout_content);
