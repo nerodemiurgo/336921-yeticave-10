@@ -20,11 +20,11 @@ $search = mysqli_real_escape_string($link, trim($_GET['search']));
 $searchLots = '';
 
 $sql = 'SELECT
-		COUNT(l.id) as count
-			FROM lot l
-			JOIN category c ON l.category_id = c.id 
-			WHERE MATCH(l.name, l.description) AGAINST(\'' . $search . '\') AND dt_finish > NOW()';
-
+        COUNT(l.id) as count
+            FROM lot l
+            JOIN category c ON l.category_id = c.id 
+            WHERE MATCH(l.name, l.description) AGAINST(\'' . $search . '\') AND dt_finish > NOW()
+            ';
 
 $result = mysqli_query($link, $sql);
 $items_count = mysqli_fetch_assoc($result);
@@ -41,19 +41,19 @@ $offset = ($cur_page - 1) * $page_items;
 $pages = range(1, $pages_count);
 
 $sql = 'SELECT
-		l.name AS lot_name,
-		c.name AS category_name,
-		l.description,
-		start_price,
-		price,
-		img,
-		dt_finish,
-		l.id AS lot_id
-		
-			FROM lot l
-			JOIN category c ON l.category_id = c.id 
-			WHERE MATCH(l.name, l.description) AGAINST(\'' . $search . '\') AND dt_finish > NOW()
-			ORDER BY created_at DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
+        l.name AS lot_name,
+        c.name AS category_name,
+        l.description,
+        start_price,
+        price,
+        img,
+        dt_finish,
+        l.id AS lot_id
+
+            FROM lot l
+            JOIN category c ON l.category_id = c.id 
+            WHERE MATCH(l.name, l.description) AGAINST(\'' . $search . '\') AND dt_finish > NOW()
+            ORDER BY created_at DESC LIMIT ' . $page_items . ' OFFSET ' . $offset;
 
 $result = mysqli_query($link, $sql);
 $lots = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -63,8 +63,8 @@ for ($n = 0; $n <= 8; $n = $n + 1) {
     if (isset($lots[$n]['lot_id'])) {
         $lot_id = $lots[$n]['lot_id'];
         $sql = 'SELECT COUNT(*) as count FROM rate
-				WHERE lot_id = ' . $lot_id . '
-				;';
+                WHERE lot_id = ' . $lot_id . '
+                ;';
         $result = mysqli_query($link, $sql);
         $rate_count = mysqli_fetch_assoc($result);
         $rate_count = $rate_count['count'] ?? 0;

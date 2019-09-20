@@ -55,16 +55,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $user = mysqli_fetch_array($res, MYSQLI_ASSOC);
             $errors = array_filter($errors);
-
-            if (empty($errors)) {
-                if (password_verify($userenter['password'], $user['password'])) {
-                    $_SESSION['user'] = $user;
-                    header('Location: /');
-                    exit;
-                } else {
-                    $errors['password'] = 'Неверный пароль';
-                }
-            }
+        }
+    }
+	
+    if (empty($errors)) {
+        if (password_verify($userenter['password'], $user['password'])) {
+            $_SESSION['user'] = $user;
+            header('Location: /');
+            exit;
+        } else {
+            $errors['password'] = 'Неверный пароль';
         }
     }
 }

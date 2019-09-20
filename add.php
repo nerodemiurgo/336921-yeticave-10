@@ -3,7 +3,7 @@
 require_once('init.php');
 
 if (empty($_SESSION['user'])) {
-    header("HTTP/1.0 403 (Forbidden, доступ запрещен");
+    header('HTTP/1.0 403 (Forbidden, доступ запрещен)');
     exit;
 }
 
@@ -70,25 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (empty($errors)) {
         //Валидация изображения
-        if (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] === UPLOAD_ERR_NO_FILE) {
-            $errors['lot-img'] = 'Вы не загрузили изображение';
-        } elseif (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] !== UPLOAD_ERR_OK) {
-            $errors['lot-img'] = 'Не удалось загрузить изображение';
+        $checkImg = validateImg();
+        if (empty ($checkImg[0])) {
+            $newlot['lot-img'] = $checkImg[1];
+            move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/' . $checkImg[1]);
         } else {
-            $tmp_name = $_FILES['lot-img']['tmp_name'];
-            $file_type = mime_content_type($tmp_name);
-
-            if ($file_type == "image/jpeg") {
-                $filename = uniqid() . '.jpg';
-                $newlot['lot-img'] = $filename;
-                move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/' . $filename);
-            } elseif ($file_type == "image/png") {
-                $filename = uniqid() . '.png';
-                $newlot['lot-img'] = $filename;
-                move_uploaded_file($_FILES['lot-img']['tmp_name'], 'uploads/' . $filename);
-            } else {
-                $errors['lot-img'] = 'Изображение должно быть формата jpg или png';
-            }
+            $errors['lot-img'] = $checkImg[1];
         }
     }
 

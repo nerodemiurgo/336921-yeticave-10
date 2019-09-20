@@ -31,18 +31,17 @@
             <span class="form__error"><?= $errors['description'] ?></span>
         <?php endif; ?>
     </div>
-    <div class="form__item form__item--file <?= empty($errors['lot-img']) ?: 'form__item--invalid' ?>"
-    ">
-    <label>Изображение <sup>*</sup></label>
-    <div class="form__input-file">
-        <input class="visually-hidden" type="file" id="lot-img" name="lot-img" value="">
-        <label for="lot-img">
-            Добавить
-        </label>
-    </div>
-    <?php if (isset($errors['lot-img'])) : ?>
-        <span class="form__error"><?= $errors['lot-img'] ?></span>
-    <?php endif; ?>
+    <div class="form__item form__item--file <?= empty($errors['lot-img']) ?: 'form__item--invalid' ?>">
+        <label>Изображение <sup>*</sup></label>
+        <div class="form__input-file">
+            <input class="visually-hidden" type="file" id="lot-img" name="lot-img" value="">
+            <label for="lot-img">
+                Добавить
+            </label>
+        </div>
+        <?php if (isset($errors['lot-img'])) : ?>
+            <span class="form__error"><?= $errors['lot-img'] ?></span>
+        <?php endif; ?>
     </div>
     <div class="form__container-three">
         <div class="form__item form__item--small <?= empty($errors['start_price']) ?: 'form__item--invalid' ?>">

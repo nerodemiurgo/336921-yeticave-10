@@ -98,11 +98,18 @@ function getUsers($sql_link)
  */
 function getLots($sql_link)
 {
-    $sql = 'SELECT l.name AS lot_name, c.name AS category_name, start_price, price, img, dt_finish, l.id AS lot_id
+    $sql = 'SELECT
+        l.name         AS lot_name,
+        c.name         AS category_name,
+        start_price,
+        price,
+        img,
+        dt_finish,
+        l.id           AS lot_id
             FROM lot l
-			JOIN category c
-			ON l.category_id = c.id  WHERE dt_finish > NOW()
-			ORDER BY created_at DESC;';
+            JOIN category c
+            ON l.category_id = c.id  WHERE dt_finish > NOW()
+            ORDER BY created_at DESC;';
     $result = mysqli_query($sql_link, $sql);
 
     if ($result === false) {
@@ -111,6 +118,7 @@ function getLots($sql_link)
 
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
+
 /**
  * Получает список пользователей из базы данных
  *
@@ -128,17 +136,17 @@ function getLot($sql_link, $link_id)
     }
 
     $sql = 'SELECT
-        l.id AS lot_id,
-        l.name AS lot_name,
-        l.description AS lot_desc,
-        l.img AS img,
-        l.start_price AS start_price,
-        l.price AS price,
-        l.dt_finish AS dt_finish,
-        l.rate_step AS rate_step,
+        l.id            AS lot_id,
+        l.name          AS lot_name,
+        l.description   AS lot_desc,
+        l.img           AS img,
+        l.start_price   AS start_price,
+        l.price         AS price,
+        l.dt_finish     AS dt_finish,
+        l.rate_step     AS rate_step,
         l.category_id,
-        l.author_id AS author_id,
-        c.name AS category_name
+        l.author_id     AS author_id,
+        c.name          AS category_name
         FROM lot l
         JOIN category c ON l.category_id = c.id
         WHERE l.id = ' . $link_id . '';
@@ -153,7 +161,6 @@ function getLot($sql_link, $link_id)
 
 /**
  * Отправляет массив в БД
-
  * @param $link mysqli Ресурс соединения
  * @param $sql mysqli Подготовленное sql выражение
  * @param $data = [] массив с данными, которые нужно отправить
@@ -200,12 +207,11 @@ function createLot(
     $imageUrl,
     $authorId
 ) {
-    $sql = <<<SQL
-INSERT INTO lot
+    $sql = 'INSERT INTO lot
     (name, description, start_price, price, dt_finish, rate_step, category_id, img, author_id)
-VALUES
+    VALUES
     (?, ?, ?, ?, ?, ?, ?, ?, ?)
-SQL;
+    ';
 
     return db_insert_data(
         $connection,
@@ -243,12 +249,11 @@ function createUser(
     $user_name,
     $contact
 ) {
-    $sql = <<<SQL
-INSERT INTO user
+    $sql = 'INSERT INTO user
     (email, password, user_name, contact)
-VALUES
+    VALUES
     (?, ?, ?, ?)
-SQL;
+    ';
 
     return db_insert_data(
         $connection,
@@ -273,6 +278,35 @@ SQL;
 function getPostVal($name)
 {
     return $_POST[$name] ?? '';
+}
+
+/**
+ * Валидация картинок
+ *
+ *
+ * @return массив с двумя значениями - индикатором наличия ошибки и ее текстом, если индикатор существует,
+ * или адрес загруженного файла, если индикатор не существует.
+ */
+function validateImg()
+{
+    if (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] === UPLOAD_ERR_NO_FILE) {
+        return ['error', 'Вы не загрузили изображение'];
+    } elseif (isset($_FILES['lot-img']['error']) && $_FILES['lot-img']['error'] !== UPLOAD_ERR_OK) {
+        return ['error', 'Не удалось загрузить изображение'];
+    } else {
+        $tmp_name = $_FILES['lot-img']['tmp_name'];
+        $file_type = mime_content_type($tmp_name);
+
+        if ($file_type == "image/jpeg") {
+            $filename = uniqid() . '.jpg';
+            return [null, $filename];
+        } elseif ($file_type == "image/png") {
+            $filename = uniqid() . '.png';
+            return [null, $filename];
+        } else {
+            return ['error', 'Изображение должно быть формата jpg или png'];
+        }
+    }
 }
 
 /**
@@ -485,13 +519,18 @@ function validateContact($item)
 function getHistoryRates($sql_link, $lot_id)
 {
     $lot_id = intval($_GET['id']) ?? 0;
-    $sql = 'SELECT r.created_at AS time, r.bid AS bid, r.user_id AS user_id, r.lot_id, u.user_name FROM rate r
-			JOIN user u
-			ON r.user_id = u.id
-			WHERE r.lot_id = ' . $lot_id . '
-			ORDER BY time DESC LIMIT 10
-			
-			;';
+    $sql = 'SELECT
+            r.created_at   AS time,
+            r.bid AS bid,
+            r.user_id      AS user_id,
+            r.lot_id,
+            u.user_name
+            FROM rate r
+            JOIN user u
+            ON r.user_id = u.id
+            WHERE r.lot_id = ' . $lot_id . '
+            ORDER BY time DESC LIMIT 10
+            ;';
     $result = mysqli_query($sql_link, $sql);
 
     if ($result === false) {
@@ -533,10 +572,14 @@ function isUserCanMakeBet($sql_link, $lot): bool
         return false;
     }
 
-    $sql = 'SELECT r.created_at AS time, r.user_id AS user_id, r.lot_id FROM rate r
-		WHERE r.lot_id = ' . $lot_id . '
-		ORDER BY time DESC LIMIT 1
-		;';
+    $sql = 'SELECT
+            r.created_at   AS time,
+            r.user_id      AS user_id,
+            r.lot_id
+            FROM rate r
+            WHERE r.lot_id = ' . $lot_id . '
+            ORDER BY time DESC LIMIT 1
+            ;';
     $result = mysqli_query($sql_link, $sql);
     $last_rate = mysqli_fetch_assoc($result);
 
@@ -669,9 +712,9 @@ function getMyLots($sql_link, $user_id)
  */
 function send_message($user_name, $content, $email)
 {
-    $transport = new Swift_SmtpTransport('phpdemo.ru', 25);
-    $transport->setPassword('htmlacademy');
-    $transport->setUsername('keks@phpdemo.ru');
+    $transport = new Swift_SmtpTransport('smtp.mailtrap.io', 2525);
+    $transport->setPassword('e3394c63fe8087');
+    $transport->setUsername('5104b333c47712');
 
     $message = new Swift_Message('Ваша ставка победила');
     $message->setTo([$email, $email => $user_name]);

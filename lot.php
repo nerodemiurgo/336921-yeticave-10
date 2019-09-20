@@ -23,7 +23,7 @@ $lot_info = getLot($link, $checkID);
 
 //Вывод ошибки, если пришел пустой массив (id объявления не существует)
 $checkLotInfo = count($lot_info);
-if ($checkLotInfo === 0) {
+if ($checkLotInfo == 0) {
     print ($error404);
     die;
 }
